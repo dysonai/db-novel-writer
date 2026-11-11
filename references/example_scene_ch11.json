@@ -1,0 +1,21 @@
+{
+  "chapter": {"num": 11, "title": "烟幕", "status": "draft", "pov": "林黛玉",
+    "summary": "清道夫远程擦除树莓派SD卡,黛玉复盘串联'哭声'真相"},
+  "scene": {"seq": 1, "location": "恒通B栋3F配电间", "time_start": "2017-07-26T14:00",
+    "time_end": "2017-07-26T14:30", "pov": "林黛玉",
+    "summary": "黛玉靠在配电柜旁,闭眼听金属件的震颤,把Ch1小红的哭声与芯片调制频率对上号"},
+  "perceptions": [
+    {"character": "林黛玉", "ptype": "SEE", "content": "配电柜金属件在轻微震颤,像有东西在里面挠铁皮", "confidence": "fact", "source_note": "Ch11 Lxx"},
+    {"character": "林黛玉", "ptype": "THINK", "content": "Ch1小红说的哭声=芯片全速调制→电源线高频纹波→机柜共振啸叫;夜深人静才听得见", "confidence": "inferred", "source_note": "Ch11复盘"},
+    {"character": "林黛玉", "ptype": "KNOW", "content": "清道夫只擦了SD卡,树莓派本身还有eMMC——证据还有一层", "target_type": "prop", "target": "树莓派eMMC", "confidence": "inferred", "source_note": "Ch11"},
+    {"character": "贾宝玉", "ptype": "KNOW", "content": "清道夫远程擦除SD卡,分片只剩碎片,但云端分片仍在", "target_type": "prop", "target": "树莓派仿板(SD卡镜像)", "confidence": "fact", "source_note": "Ch11"},
+    {"character": "林黛玉", "ptype": "KNOW", "content": "B-03存储服务器被删,老孙当晚'意外摔伤'昏迷", "confidence": "fact", "source_note": "Ch11"}
+  ],
+  "events": [
+    {"time": "2017-07-26T14:00", "type": "擦除", "description": "清道夫watchdog触发远程擦除树莓派SD卡,SHRED覆写", "involved": ["清道夫"], "consequence": "SD卡只剩碎片,但eMMC与云端分片仍在"},
+    {"time": "2017-07-26T14:10", "type": "昏迷", "description": "老孙城东家中'意外摔伤'昏迷", "involved": ["老孙", "清道夫"], "consequence": "内鬼线中断,Ch11收尾钩子"}
+  ],
+  "timeline": [
+    {"datetime": "2017-07-26T14:00", "event_summary": "清道夫远程擦除树莓派SD卡", "kind": "absolute", "anchor_note": "Ch11"}
+  ]
+}

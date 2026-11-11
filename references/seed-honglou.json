@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "project": "《红楼：硬件鬼才林黛玉》",
+    "source": "伏笔与回收追踪.md / 时间线与状态.md / 关键道具清单.md / 人物档案(截至Ch10)",
+    "note": "本种子为策展数据, 与正文已钉死设定对齐。Ch11+ 写作请用 capture.py 增量录入。"
+  },
+
+  "locations": [
+    {"name": "城西老居民楼402", "type": "room"},
+    {"name": "恒通机房A-07", "type": "room"},
+    {"name": "恒通B栋3F配电间", "type": "room"},
+    {"name": "东华路茶室", "type": "room"},
+    {"name": "西郊殡仪馆实验室", "type": "room"},
+    {"name": "宁府科技", "type": "building"},
+    {"name": "恒通大厦", "type": "building"},
+    {"name": "京都（浩达雪）", "type": "building"},
+    {"name": "货运通道", "type": "outdoor"}
+  ],
+
+  "characters": [
+    {"name": "林黛玉", "alias": "黛玉", "role": "主角", "status": "停职+通缉", "location_name": "城西老居民楼402", "first_appearance": "Ch1", "skills_note": "全栈工程师:软件主干,硬件第二,懂网络安全;信息管理专业出身被当Java招进恒通", "blind_spots": "射频实测仪器不精(实操归周瑞);不写exploit;不碰Linux内核/驱动", "bio": "恒通研发部硬件工程师,工号LD-0731;父林如海2010年因发现幽灵芯片意外死亡"},
+    {"name": "贾宝玉", "alias": "宝玉", "role": "关键", "status": "CTO入职前夕", "location_name": "恒通大厦", "first_appearance": "Ch8", "skills_note": "电子工程CTO:硬件主干,固件/系统层安全(CVE-2013-4786主场),经营管理靠家庭熏陶", "blind_spots": "芯片级物理攻击不熟(侧信道/解剖归周瑞);不碰业务代码/Java生态", "bio": "电子工程出身,贾家红三代;空降恒通CTO,与凤姐自小认识"},
+    {"name": "周瑞", "alias": "周师兄", "role": "关键", "status": "暗中协助", "location_name": "城西老居民楼402", "first_appearance": "Ch5", "skills_note": "电子专业安全专家:芯片级/侧信道/射频实测四人唯一权威,网络/安全全精", "blind_spots": "不碰业务代码/Java生态;云原生/容器化生疏;年龄带来工具代差", "bio": "省信安中心硬件安全分析专家;林如海徒弟,与黛玉平辈;子周河山18岁"},
+    {"name": "史湘云", "alias": "湘云", "role": "核心羁绊", "status": "出逃", "location_name": "城西老居民楼402", "first_appearance": "Ch1", "skills_note": "Java工程师(运维部待过一年):软件为主,懂点硬件网络", "blind_spots": "加密算法只会调脚本不会写实现;硬件识别浅;ACL深层配置靠小余", "bio": "恒通研发部Java开发,黛玉最佳拍档;前运维部同事小余是远程后援"},
+    {"name": "王熙凤", "alias": "凤姐", "role": "反派", "status": "转赴京都查明泄漏源", "location_name": "京都（浩达雪）", "first_appearance": "Ch1", "skills_note": "研发部经理/事实执行副总;以'流程合规'为武器;吃回扣参与者", "blind_spots": "以为服务器里是普通IC配件,不知是后门芯片;被清道夫利用", "bio": "贾琏之妻,贾政侄媳;策略性撤退暂不追黛玉,先查BMC清道夫"},
+    {"name": "贾珍", "alias": "", "role": "反派", "status": "销毁文件→自保", "location_name": "宁府科技", "first_appearance": "Ch1", "skills_note": "宁府科技顾问/省硬件鉴定委员会注册鉴定师;硬件后门制造商", "blind_spots": "被骗走BMC密码(冒充浩达雪尽调);不知清道夫是谁", "bio": "宁府科技实际控制人之一;2014年京都见'姓薛的'"},
+    {"name": "薛宝钗", "alias": "宝钗", "role": "关键(未登场)", "status": "未登场", "location_name": "京都（浩达雪）", "first_appearance": "Ch6", "skills_note": "浩达雪投资(河东)投资管理部经理;合规红线清晰", "blind_spots": "—", "bio": "薛家实控,总部京都;第二卷前期正式登场"},
+    {"name": "柳湘莲", "alias": "", "role": "关键", "status": "下落不明", "location_name": "未知", "first_appearance": "Ch10", "skills_note": "恒通运维部首任主管(2010-2014);树莓派安装者,旧根密钥持有者", "blind_spots": "2014.3根密钥被强制替换=被清道夫接管;2014.6离职失踪", "bio": "并州理工计算机系2009届;太虚幻境一期数据出口打通者"},
+    {"name": "焦大", "alias": "", "role": "配角", "status": "正常工作(不知被录音)", "location_name": "宁府科技", "first_appearance": "Ch3", "skills_note": "宁府科技基层;供述回扣(进价80卖800,贾珍400/凤姐200)", "blind_spots": "—", "bio": "被黛玉假扮快递员套出口供"},
+    {"name": "贾蓉", "alias": "", "role": "配角", "status": "待命做假鉴定", "location_name": "瑞祥检测", "first_appearance": "Ch3", "skills_note": "瑞祥检测负责人;提供'定制鉴定'", "blind_spots": "—", "bio": "贾珍之子"},
+    {"name": "老孙", "alias": "", "role": "配角", "status": "内鬼(昏迷线待展开)", "location_name": "宁府科技", "first_appearance": "Ch10", "skills_note": "恒通运维;2017.2.14恢复liu_wei账号为清道夫开门", "blind_spots": "—", "bio": "清道夫内应;Ch11'意外摔伤'昏迷线"},
+    {"name": "贾政", "alias": "", "role": "未露面", "status": "未知", "location_name": "未知", "first_appearance": "Ch1", "skills_note": "恒通实际控制人(60%)", "blind_spots": "清道夫在内网扎根7年,'不知情'留白", "bio": "第一卷不揭"},
+    {"name": "许秀兰", "alias": "周瑞家的", "role": "配角", "status": "正常", "location_name": "未知", "first_appearance": "Ch9", "skills_note": "河东传媒学院舞蹈表演毕业,无业,棋牌室+广场舞", "blind_spots": "—", "bio": "周瑞之妻;与王夫人同住政法家属院"},
+    {"name": "周河山", "alias": "", "role": "配角", "status": "职校在读", "location_name": "未知", "first_appearance": "Ch9", "skills_note": "18岁,初中毕业上河东省工程职业技术学校五年制机电应用技术", "blind_spots": "好赌;清道夫腐化突破口", "bio": "周瑞之子"}
+  ],
+
+  "props": [
+    {"name": "幽灵芯片PM-7721", "category": "核心物证", "description": "ARM Cortex-M3军用级侧信道攻击模块,伪装为电源管理IC,嵌A-07主板;断电约72h自毁,当前约24h", "holder_name": "林黛玉", "location_name": "城西老居民楼402", "status": "在手中(约剩24h自毁)", "first_appearance": "Ch2", "specs": "{\"内核\":\"ARM Cortex-M3\",\"自毁\":\"断电72h/2.0V阈值\",\"接收端MAC\":\"02:00:00:77:21:BB\"}"},
+    {"name": "树莓派仿板(SD卡镜像)", "category": "电子证据", "description": "国产仿板+博通BCM2835 ES片;SD卡5GB七年认证事件流已解密(shadow_db)", "holder_name": "史湘云", "location_name": "城西老居民楼402", "status": "已解密(7年认证事件流全貌)", "first_appearance": "Ch8", "specs": "{\"PCB\":\"红色+透明三防漆\",\"SoC\":\"BCM2835 ES\",\"MAC\":\"02:00:00:77:21:BB\"}"},
+    {"name": "树莓派eMMC", "category": "电子证据", "description": "4GB板载存储,含固件+运维日志,根密钥替换记录", "holder_name": "史湘云", "location_name": "城西老居民楼402", "status": "待提取", "first_appearance": "Ch9"},
+    {"name": "SD卡(原始日志备份)", "category": "电子证据", "description": "系统瘫痪前内存转储+后续树莓派镜像;藏《Java编程思想》第256页", "holder_name": "史湘云", "location_name": "城西老居民楼402", "status": "已解密", "first_appearance": "Ch5"},
+    {"name": "录音笔(焦大供述)", "category": "电子证据", "description": "焦大供述:进价80卖800,贾珍拿400,王熙凤拿200", "holder_name": "林黛玉", "location_name": "城西老居民楼402", "status": "持有(间接证据)", "first_appearance": "Ch5"},
+    {"name": "黛玉取证U盘(密钥碎片/工具链)", "category": "电子证据", "description": "自写工具链+解密密钥碎片;完整加密证据分片在境外匿名云", "holder_name": "贾宝玉", "location_name": "恒通大厦", "status": "已移交( Ch9茶室 )", "first_appearance": "Ch9"},
+    {"name": "ESP32手表(通灵宝玉)", "category": "随身物品", "description": "宝玉自制,BLE 4.2,赠黛玉;逆向溯源工具载体", "holder_name": "林黛玉", "location_name": "城西老居民楼402", "status": "佩戴", "first_appearance": "Ch9"},
+    {"name": "宁府科技备用件PCB", "category": "核心物证", "description": "七颗PM-7721备用件(一颗空位=被黛玉拆走);正面极像幽灵芯片背面无天线", "holder_name": "贾珍", "location_name": "宁府科技", "status": "随身", "first_appearance": "Ch3"},
+    {"name": "太虚二期合影", "category": "文档证据", "description": "2014.5.17签署现场,柳湘莲+两军人+贾珍;贾珍粉碎文件时保留", "holder_name": "贾珍", "location_name": "宁府科技", "status": "保留", "first_appearance": "Ch10"}
+  ],
+
+  "chapters": [
+    {"num": 1, "title": "哭声", "status": "done", "pov_character_name": "林黛玉", "summary": "并州理工'电气火灾'旧案引出幽灵机箱与机房哭声"},
+    {"num": 2, "title": "听声定位", "status": "done", "pov_character_name": "林黛玉", "summary": "黛玉深夜进机房闭眼倾听,循'滋——哒'声锁定A-07机柜"},
+    {"num": 3, "title": "拆机", "status": "done", "pov_character_name": "林黛玉", "summary": "00:44拆下幽灵芯片,工单变更为硬件异常,三方对质"},
+    {"num": 4, "title": "对质", "status": "done", "pov_character_name": "史湘云", "summary": "湘云赶来提供证据,黛玉签署停职通知离开"},
+    {"num": 5, "title": "搜家与烧机", "status": "done", "pov_character_name": "林黛玉", "summary": "省图/宁府/周瑞;深夜A-07自焚,清道夫远程烧机"},
+    {"num": 6, "title": "解剖", "status": "done", "pov_character_name": "林黛玉", "summary": "殡仪馆实验室全量解剖:256位AES密钥+RF beacon+接收端MAC"},
+    {"num": 7, "title": "解密", "status": "done", "pov_character_name": "史湘云", "summary": "AES解密→ghost设备确认→树莓派取获线索"},
+    {"num": 8, "title": "取获", "status": "done", "pov_character_name": "史湘云", "summary": "湘云配电间取树莓派,闻硬底皮鞋脚步声;论坛暗语上报"},
+    {"num": 9, "title": "结盟", "status": "done", "pov_character_name": "林黛玉", "summary": "茶室三方同盟+ESP32手表交接+SD卡镜像解密"},
+    {"num": 10, "title": "索引", "status": "done", "pov_character_name": "贾宝玉", "summary": "宝玉CTO权限进机房dump BMC日志,发现清道夫七次登录+打印机跳板"},
+    {"num": 11, "title": "烟幕", "status": "outline", "pov_character_name": "林黛玉", "summary": "清道夫树莓派远程擦除反击;B-03被删;老孙昏迷;黛玉复盘串联哭声"}
+  ],
+
+  "scenes": [
+    {"key": "ch2_dismantle", "chapter_num": 2, "seq": 1, "location": "恒通机房A-07", "time_start": "2017-07-24T00:44", "time_end": "2017-07-24T00:47", "pov": "林黛玉", "summary": "黛玉拆下幽灵芯片,闭眼听出'滋——哒'声锁定机柜"},
+    {"key": "ch5_burn", "chapter_num": 5, "seq": 1, "location": "恒通机房A-07", "time_start": "2017-07-24T23:17", "time_end": "2017-07-24T23:42", "pov": "王熙凤", "summary": "清道夫经BMC登录关风扇锁功耗擦SPI,服务器自焚"},
+    {"key": "ch8_xiangyun", "chapter_num": 8, "seq": 1, "location": "恒通B栋3F配电间", "time_start": "2017-07-25T04:00", "time_end": "2017-07-25T04:20", "pov": "史湘云", "summary": "湘云取树莓派,闻硬底皮鞋脚步声停门外转向机房"},
+    {"key": "ch9_teahouse", "chapter_num": 9, "seq": 1, "location": "东华路茶室", "time_start": "2017-07-25T10:30", "time_end": "2017-07-25T11:30", "pov": "贾宝玉", "summary": "宝玉出场三方同盟,交ESP32手表与取证U盘"},
+    {"key": "ch10_dump", "chapter_num": 10, "seq": 1, "location": "恒通机房A-07", "time_start": "2017-07-25T14:37", "time_end": "2017-07-25T15:30", "pov": "贾宝玉", "summary": "宝玉以CTO权限dump BMC日志,实时发现清道夫反击"}
+  ],
+
+  "perceptions": [
+    {"scene_key": "ch2_dismantle", "character": "林黛玉", "ptype": "SEE", "content": "主板隔板上有一颗伪装成电源管理IC的黑色芯片,焊点异常干净", "target_type": "prop", "target": "幽灵芯片PM-7721", "confidence": "fact", "source_note": "Ch2"},
+    {"scene_key": "ch2_dismantle", "character": "林黛玉", "ptype": "HEAR", "content": "风扇轰鸣缝隙里约10秒间隔的'滋——哒'微弱异响,与芯片LED同频", "confidence": "fact", "source_note": "Ch2"},
+    {"scene_key": "ch2_dismantle", "character": "林黛玉", "ptype": "THINK", "content": "这东西不该在这儿——它的监听频率比业务心跳高得多", "target_type": "prop", "target": "幽灵芯片PM-7721", "confidence": "inferred", "source_note": "Ch2"},
+    {"scene_key": "ch5_burn", "character": "王熙凤", "ptype": "SEE", "content": "A-07机柜侧板缝里冒出焦烟,服务器灯全灭", "confidence": "fact", "source_note": "Ch5"},
+    {"scene_key": "ch5_burn", "character": "王熙凤", "ptype": "KNOW", "content": "芯片被拆后清道夫才远程毁证——烧机不是黛玉干的", "confidence": "inferred", "source_note": "Ch5/Ch9"},
+    {"scene_key": "ch8_xiangyun", "character": "史湘云", "ptype": "SEE", "content": "母排缝隙夹着一块红色PCB小板,三防漆透出红底", "target_type": "prop", "target": "树莓派仿板(SD卡镜像)", "confidence": "fact", "source_note": "Ch8"},
+    {"scene_key": "ch8_xiangyun", "character": "史湘云", "ptype": "HEAR", "content": "硬底皮鞋脚步声停在配电间门外,片刻后往机房方向去", "confidence": "fact", "source_note": "Ch8"},
+    {"scene_key": "ch8_xiangyun", "character": "史湘云", "ptype": "THINK", "content": "软底胶鞋是保安标配,这人不是安保部——有目的性", "confidence": "inferred", "source_note": "Ch8"},
+    {"scene_key": "ch9_teahouse", "character": "贾宝玉", "ptype": "SAY", "content": "周叔。", "target_type": "character", "target": "周瑞", "confidence": "fact", "source_note": "Ch9"},
+    {"scene_key": "ch9_teahouse", "character": "周瑞", "ptype": "KNOW", "content": "宝玉的来历(王家政法系统搭班半辈子,与宝玉家旧识)", "target_type": "character", "target": "贾宝玉", "confidence": "fact", "source_note": "Ch9"},
+    {"scene_key": "ch9_teahouse", "character": "林黛玉", "ptype": "THINK", "content": "芯片电量在肉眼可见地流失,每调试一次就少一块", "target_type": "prop", "target": "幽灵芯片PM-7721", "confidence": "inferred", "source_note": "Ch9"},
+    {"scene_key": "ch10_dump", "character": "贾宝玉", "ptype": "SEE", "content": "BMC审计日志里七次境外VPN登录,跳板是二楼打印机8088端口", "confidence": "fact", "source_note": "Ch10"},
+    {"scene_key": "ch10_dump", "character": "贾宝玉", "ptype": "THINK", "content": "我进机房31分钟后清道夫才开始清痕迹——他在实时感知我", "confidence": "inferred", "source_note": "Ch10"}
+  ],
+
+  "prop_transfers": [
+    {"prop": "幽灵芯片PM-7721", "from": null, "to": "林黛玉", "scene_key": "ch2_dismantle", "chapter_num": 2, "method": "从A-07主板拆下", "note": "Ch3深夜拆解,自毁倒计时启动"},
+    {"prop": "树莓派仿板(SD卡镜像)", "from": null, "to": "史湘云", "scene_key": "ch8_xiangyun", "chapter_num": 8, "method": "配电间取获", "note": "Ch9完成SD卡镜像解密"},
+    {"prop": "黛玉取证U盘(密钥碎片/工具链)", "from": "林黛玉", "to": "贾宝玉", "scene_key": "ch9_teahouse", "chapter_num": 9, "method": "茶室交接", "note": "U盘是钥匙,完整证据在云上", "new_status": "已移交( Ch9茶室 )"}
+  ],
+
+  "events": [
+    {"chapter_num": 2, "scene_key": "ch2_dismantle", "time": "2017-07-24T00:44", "type": "拆解", "description": "黛玉拆下幽灵芯片PM-7721", "involved": ["林黛玉"], "consequence": "自毁倒计时约60h启动;清道夫心跳告警"},
+    {"chapter_num": 5, "scene_key": "ch5_burn", "time": "2017-07-24T23:17", "type": "烧机", "description": "清道夫BMC登录关风扇锁功耗擦SPI", "involved": ["清道夫", "王熙凤", "贾珍"], "consequence": "A-07自焚毁证;采购合同BIOS被擦"},
+    {"chapter_num": 10, "scene_key": "ch10_dump", "time": "2017-07-25T14:37", "type": "dump", "description": "宝玉CTO权限全量dump BMC日志", "involved": ["贾宝玉"], "consequence": "发现清道夫七次登录+打印机8088跳板"},
+    {"chapter_num": 10, "scene_key": "ch10_dump", "time": "2017-07-25T17:43:22", "type": "擦除", "description": "清道夫删liu_wei账号+清三个月BMC审计日志", "involved": ["清道夫", "老孙"], "consequence": "老孙恢复的账号被抹,痕迹覆盖"}
+  ],
+
+  "foreshadowing": [
+    {"code": "V01", "title": "林父之死的真相", "planted_chapter": "Ch1", "status": "planted", "description": "林如海2010年'意外触电'暗示与幽灵芯片有关", "note": "核心主线,预计贯穿多卷"},
+    {"code": "V02", "title": "幽灵芯片的自毁倒计时", "planted_chapter": "Ch5", "status": "active", "description": "断电约72h自毁,Ch10末约24h", "note": "证据链已完善,缺接收端日志闭环"},
+    {"code": "V03", "title": "SD卡备份", "planted_chapter": "Ch5", "status": "active", "description": "SD卡藏《Java编程思想》256页,含原始日志", "note": "已解密,数据面转入全量提取"},
+    {"code": "V04", "title": "贾珍的采购合同备份", "planted_chapter": "Ch5", "status": "dropped", "description": "加密合同藏A-07 BIOS,清道夫擦除", "note": "BIOS已毁,纸备份部分残存"},
+    {"code": "V05", "title": "王熙凤的吃回扣", "planted_chapter": "Ch3", "status": "active", "description": "单一来源采购溢价40%,回扣400-600万", "note": "录音是间接证据,待报价单补充"},
+    {"code": "V06", "title": "宁府科技的实际控制人", "planted_chapter": "Ch5", "status": "planted", "description": "贾珍称'顾问',暗示非法人", "note": "待展开"},
+    {"code": "V07", "title": "周瑞与林父的关系", "planted_chapter": "Ch5", "status": "active", "description": "周瑞是林如海徒弟", "note": "动机明确,林父故事线待展开"},
+    {"code": "V08", "title": "太虚幻境-I / 太虚幻境网络", "planted_chapter": "Ch1", "status": "planted", "description": "宁府捐赠并州理工+恒通采购同源服务器", "note": "全国节点数/军人背景待展开"},
+    {"code": "V09", "title": "机房里的'哭声'", "planted_chapter": "Ch1", "status": "active", "description": "芯片功耗调制→电源线纹波→机柜共振啸叫", "note": "Ch11-14黛玉复盘串联+自毁前最后哭声"},
+    {"code": "V10", "title": "两群对手(清道夫)", "planted_chapter": "Ch6", "status": "planted", "description": "追猎者(凤姐/贾珍) vs 清道夫(身份未揭)", "note": "新线索:恒通内网实时监控能力"},
+    {"code": "V11", "title": "树莓派(Ghost设备)", "planted_chapter": "Ch8", "status": "paid_off", "description": "RF Beacon接收端,MAC 02:00:00:77:21:BB", "note": "已取获+解密七年认证事件流"},
+    {"code": "V12", "title": "薛宝钗/浩达雪投资", "planted_chapter": "Ch6", "status": "planted", "description": "贾珍京都见'姓薛的',冒充尽调骗BMC密码", "note": "第二卷前期宝钗正式登场回收"},
+    {"code": "V13", "title": "贾宝玉空降CTO", "planted_chapter": "Ch8", "status": "paid_off", "description": "周瑞口述两天后空降,Ch9出场Ch10推进", "note": "已回收+持续推进"},
+    {"code": "V14", "title": "柳湘莲", "planted_chapter": "Ch10", "status": "planted", "description": "树莓派安装者,旧根密钥持有者,2014.6离职失踪", "note": "下一阶段核心追踪目标"},
+    {"code": "V15", "title": "清道夫打印机跳板", "planted_chapter": "Ch10", "status": "planted", "description": "172.16段→二楼财务部打印机8088代理", "note": "待追踪"},
+    {"code": "V16", "title": "老孙的'摔伤'", "planted_chapter": "Ch10", "status": "planted", "description": "恢复liu_wei账号为清道夫开门", "note": "Ch11昏迷线展开"},
+    {"code": "V17", "title": "恒通监控系统落后", "planted_chapter": "Ch8", "status": "planted", "description": "仅记录无移动侦测/区域报警", "note": "后续凤姐换监控捞回扣"},
+    {"code": "V18", "title": "配电间外的脚步声", "planted_chapter": "Ch8", "status": "planted", "description": "硬底皮鞋/数步子/停门转向机房", "note": "疑为清道夫楼内物理眼线,Ch11揭示"},
+    {"code": "V19", "title": "国产仿板", "planted_chapter": "Ch9", "status": "planted", "description": "2011无正版→国产仿板+博通BCM2835 ES片双灰色渠道", "note": "第二/四卷供应链线"},
+    {"code": "V20", "title": "周瑞黑化线", "planted_chapter": "Ch9", "status": "planted", "description": "清道夫利用周河山赌债拉拢腐化周瑞", "note": "中卷拉拢腐化,后卷入狱"},
+    {"code": "V21", "title": "黛玉的证据链", "planted_chapter": "Ch9", "status": "active", "description": "拆机前导出3天日志+云端分片,U盘只留密钥碎片", "note": "Ch10+宝玉反查云端分片"},
+    {"code": "V22", "title": "警方重查'单人作案'", "planted_chapter": "Ch5", "status": "planted", "description": "烧毁残骸异常焊盘→对单人作案起疑", "note": "Ch11+警方副线"}
+  ],
+
+  "timeline": [
+    {"datetime": "2010-09-14", "chapter_num": null, "event_summary": "太虚幻境-I一期部署恒通机房,A-07通电,芯片UPTIME起算", "kind": "absolute", "anchor_note": "Ch14细纲"},
+    {"datetime": "2011-03-17", "chapter_num": null, "event_summary": "柳湘莲配电间安装树莓派仿板,数据出口打通", "kind": "absolute", "anchor_note": "Ch9/Ch10"},
+    {"datetime": "2014-03-15", "chapter_num": null, "event_summary": "树莓派根密钥被强制替换,柳湘莲被清道夫接管", "kind": "absolute", "anchor_note": "Ch10"},
+    {"datetime": "2014-05-17", "chapter_num": null, "event_summary": "'太虚'二期合同签署(合影:柳湘莲+两军人+贾珍)", "kind": "absolute", "anchor_note": "Ch10"},
+    {"datetime": "2014-06-01", "chapter_num": null, "event_summary": "柳湘莲离职,此后杳无音信", "kind": "absolute", "anchor_note": "Ch10"},
+    {"datetime": "2017-07-23T20:15", "chapter_num": 1, "event_summary": "荣国系统二期上线,系统响应延迟", "kind": "absolute", "anchor_note": "Ch3"},
+    {"datetime": "2017-07-24T00:03", "chapter_num": 2, "event_summary": "林黛玉刷卡进入机房", "kind": "absolute", "anchor_note": "Ch2/Ch3"},
+    {"datetime": "2017-07-24T00:44", "chapter_num": 3, "event_summary": "拆下幽灵芯片", "kind": "absolute", "anchor_note": "Ch2/Ch3"},
+    {"datetime": "2017-07-24T09:32", "chapter_num": 4, "event_summary": "史湘云赶到提供证据", "kind": "absolute", "anchor_note": "Ch4"},
+    {"datetime": "2017-07-24T23:17", "chapter_num": 5, "event_summary": "清道夫经BMC登录A-07烧机,23:42登出", "kind": "absolute", "anchor_note": "Ch5/Ch9/Ch10"},
+    {"datetime": "2017-07-25T07:30", "chapter_num": 8, "event_summary": "史湘云从货运通道突围", "kind": "absolute", "anchor_note": "Ch8/Ch9"},
+    {"datetime": "2017-07-25T10:30", "chapter_num": 9, "event_summary": "东华路茶室:宝玉出场,三方同盟建成", "kind": "absolute", "anchor_note": "Ch9"},
+    {"datetime": "2017-07-25T14:37", "chapter_num": 10, "event_summary": "宝玉CTO权限进机房dump BMC日志", "kind": "absolute", "anchor_note": "Ch10"},
+    {"datetime": "2017-07-25T17:43:22", "chapter_num": 10, "event_summary": "清道夫删liu_wei账号+清审计日志(打印机8088跳板)", "kind": "absolute", "anchor_note": "Ch10"},
+    {"datetime": "2017-07-25T19:00", "chapter_num": 10, "event_summary": "Ch10结尾:芯片约剩24h,宝玉入职倒计时12h", "kind": "absolute", "anchor_note": "Ch10"},
+    {"datetime": "2017-07-26T14:00", "chapter_num": 11, "event_summary": "芯片自毁:2.0V阈值触发,0.3秒烧穿内核", "kind": "absolute", "anchor_note": "Ch14"}
+  ]
+}

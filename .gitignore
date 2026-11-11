@@ -1,0 +1,11 @@
+# 生成的数据库（可由种子 JSON 重建，不入库）
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
