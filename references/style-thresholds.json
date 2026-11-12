@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "name": "文学性风格阈值",
+    "version": "1.0",
+    "note": "可逐项目覆盖的默认值。literary_audit.py 据此计算密度告警。数值可按项目硬规则调整（如《红楼》破折号上限 7/千字）。",
+    "usage": "init_db.py --seed-literary 会将其灌入 style_thresholds 表。"
+  },
+  "thresholds": [
+    {
+      "name": "dash_per_1k",
+      "value": 7,
+      "unit": "处/千字",
+      "note": "破折号“——”每千字上限；超则提示改逗号/句号。"
+    },
+    {
+      "name": "simile_per_1k",
+      "value": 4,
+      "unit": "处/千字",
+      "note": "明喻(像/如/如同…)每千字上限，与 rhetoric_catalog 中明喻 density_limit 对齐。"
+    },
+    {
+      "name": "consecutive_short_sent",
+      "value": 3,
+      "unit": "句",
+      "note": "连续 ≤6 字短句的最大允许数；超则提示断奏依赖（staccato）。"
+    },
+    {
+      "name": "ai_pattern_per_1k",
+      "value": 3,
+      "unit": "处/千字",
+      "note": "AI 味写法（auto_fix=1 的 substring 命中）每千字上限。"
+    }
+  ]
+}

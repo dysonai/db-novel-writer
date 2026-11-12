@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "name": "修辞手法图谱",
+    "version": "1.1",
+    "note": "通用可复用。每种手法的形式定义、标记词、轮换规则与密度上限。literary_audit.py 的 rhetoric 子命令据此统计实际密度并建议轮换。connectors 为 JSON 数组（尽量用有区分度的短语，避免裸常见字如'是/他'造成误报）。density_limit=0 表示结构性手法不自动告警，仅供人工参考其轮换规则。",
+    "usage": "init_db.py --seed-literary 会将其灌入 rhetoric_catalog 表。"
+  },
+  "devices": [
+    {
+      "type": "明喻",
+      "format_desc": "本体 + 喻词(像/如同/宛如/犹如/仿若/好比/似的) + 喻体",
+      "connectors": ["像", "如同", "宛如", "犹如", "仿若", "好比", "似的"],
+      "example": "声音冷得像冰",
+      "rotation_rule": "同一场景内同一喻词不连续出现；全篇按 connectors 轮换，避免“像”字堆砌。喻体要具体到可感知的实物/动作，忌抽象温度词（冰/刀/箭）。",
+      "density_limit": 4
+    },
+    {
+      "type": "暗喻",
+      "format_desc": "本体 + 成了/化作/变作/便是 + 喻体（无喻词“像”）",
+      "connectors": ["成了", "化作", "变作", "便是", "俨然"],
+      "example": "机房成了他的战场",
+      "rotation_rule": "喻体避免与明喻复用同一批次（冰/刀）；暗喻更适合作业性、状态性比喻。",
+      "density_limit": 3
+    },
+    {
+      "type": "拟人",
+      "format_desc": "赋予非人事物以人的动作/情绪/意志",
+      "connectors": ["低语", "屏住呼吸", "注视", "沉默地", "伸出手", "不说话"],
+      "example": "示波器的绿光沉默地注视着他",
+      "rotation_rule": "拟人宜点到为止，一章内同类事物拟人不超过两次，避免童话感。",
+      "density_limit": 2
+    },
+    {
+      "type": "排比",
+      "format_desc": "三个及以上结构相近的短语/分句并列",
+      "connectors": ["一遍遍", "一次次", "有的", "一会儿", "一张张"],
+      "example": "他拆开了外壳，他读出了波形，他听见了芯片的呼吸",
+      "rotation_rule": "排比要有递进或递进之外的变化，忌三连短句机械断奏（见 style_thresholds.consecutive_short_sent）。",
+      "density_limit": 3
+    },
+    {
+      "type": "通感",
+      "format_desc": "一种感官体验用另一种感官描述（如“冰冷的声音”“明亮的沉默”）",
+      "connectors": ["冰冷的声音", "尖锐的安静", "苦涩的笑", "明亮的沉默"],
+      "example": "那是一种带着焊锡味的沉默",
+      "rotation_rule": "通感是高级手法，宜稀少；一章不超过一处，且与明喻簇错开使用。",
+      "density_limit": 1
+    },
+    {
+      "type": "夸张",
+      "format_desc": "故意放大/缩小以强调",
+      "connectors": ["仿佛要把", "几乎要", "整座", "全世界", "恨不得"],
+      "example": "安静得能听见尘埃落地",
+      "rotation_rule": "夸张用于情绪顶点，平铺段落慎用，避免与程度副词叠用。",
+      "density_limit": 2
+    },
+    {
+      "type": "反问",
+      "format_desc": "以疑问形式表达确定意思，答案在问中",
+      "connectors": ["难道", "岂", "何必", "谁又能"],
+      "example": "难道这芯片自己会说话？",
+      "rotation_rule": "反问用于角色内心或对话交锋，连续两问以上需有层次。",
+      "density_limit": 2
+    },
+    {
+      "type": "对偶",
+      "format_desc": "结构对称、字数相近的两句并列（结构性手法，不自动告警）",
+      "connectors": ["一边", "一面"],
+      "example": "左手握着烙铁，右手压着芯片",
+      "rotation_rule": "对偶适合动作/状态对照，硬凑对仗会显匠气；靠人工判断，不计入密度上限。",
+      "density_limit": 0
+    },
+    {
+      "type": "反复",
+      "format_desc": "同一词句重复出现以强调",
+      "connectors": ["还是", "依旧", "一遍遍", "一次次"],
+      "example": "他一遍遍重焊，一遍遍失败",
+      "rotation_rule": "反复须有间隔与递进，紧邻重复易显啰嗦。",
+      "density_limit": 2
+    },
+    {
+      "type": "借代",
+      "format_desc": "用相关事物代替本体（如“白大褂”代医生，“烙铁”代焊工）",
+      "connectors": ["白大褂", "烙铁", "镜片后", "袖口", "制服"],
+      "example": "镜片后那双眼睛盯着波形",
+      "rotation_rule": "借代依赖上下文已建立的指代，初次出现须可还原。",
+      "density_limit": 3
+    },
+    {
+      "type": "反语",
+      "format_desc": "正话反说或反话正说，含讽刺/无奈",
+      "connectors": ["好一个", "真是", "多亏", "可真"],
+      "example": "可真是个讲规矩的地方",
+      "rotation_rule": "反语靠语气支撑，正文需有情绪铺垫，否则易成说教。",
+      "density_limit": 1
+    },
+    {
+      "type": "移就",
+      "format_desc": "把本属于甲的修饰语移到乙上（如“愁闷的雨季”“无情的时钟”）",
+      "connectors": ["愁闷的", "无情的", "辛酸的", "疲惫的"],
+      "example": "他关掉那盏疲惫的台灯",
+      "rotation_rule": "移就属精妙用法，一章至多一处，避免与拟人混淆。",
+      "density_limit": 1
+    }
+  ]
+}

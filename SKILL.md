@@ -28,11 +28,13 @@ agent_created: true
 ### 1. 初始化(一次)
 ```bash
 python scripts/init_db.py --db .novel-db/novel.db \
-    --seed references/seed-honglou.json
+    --seed references/seed-honglou.json \
+    --seed-literary
 ```
 - `--seed`:灌入策展种子(本项目已备 `seed-honglou.json`,对齐 V01–V22/时间线/道具/人物)
+- `--seed-literary`:灌入**文学性种子**——修辞手法图谱(`rhetoric-catalog.json`)、AI 味写法谱系(`ai-flavor-catalog.json`)、风格阈值(`style-thresholds.json`)。这三份是**通用可复用**数据,换项目不必改
 - 也可用 `--project "D:/Claw/IntellectualProperties/红楼悬疑"` 从现有 md best-effort 导入占位
-- schema 从 `scripts/schema.sql` 读取
+- schema 从 `scripts/schema.sql` 读取(共 16 张表:11 张一致性 + 5 张文学性)
 
 ### 2. 动笔前:查状态(避免写飞)
 ```bash
@@ -66,6 +68,36 @@ python scripts/report.py --db .novel-db/novel.db --out .novel-db/report.md
   foreshadowing_open(未回收)/perception_dangling(悬空引用)/timeline_order,写入 `consistency_issues`
 - `report.py`:生成 markdown 一致性看板(角色状态/道具/伏笔/时间线/问题)
 
+### 6. 文学性审查(降 AI 味 / 修辞轮换)
+
+初稿完成后,用 `literary_audit.py` 把正文过一遍"人机味"体检——所有判定依据都在数据库里,
+阈值与谱系可逐项目覆盖,不写死在代码里。
+
+```bash
+# 扫描 AI 味写法(命中位置 + 轮换替换建议)
+python scripts/literary_audit.py ai-flavor --db .novel-db/novel.db \
+    --text-file 第009章-结盟.md --chapter 9
+
+# 一键去味:仅对 substring 且 auto_fix=1 的条目做轮换替换, 输出干净稿
+python scripts/literary_audit.py ai-flavor --db .novel-db/novel.db \
+    --text-file draft.md --fix --out draft.clean.md
+
+# 修辞密度与同词近距离重复
+python scripts/literary_audit.py rhetoric --db .novel-db/novel.db --text-file 第009章-结盟.md
+
+# 综合 markdown 审计报告(并落库 style_audit_issues / rhetoric_usage)
+python scripts/literary_audit.py report --db .novel-db/novel.db \
+    --text-file 第009章-结盟.md --out .novel-db/lit-audit.md --chapter 9
+```
+
+- `ai-flavor`:扫描 `ai_flavor_catalog` 谱系,输出「行:列 / 类别 / 命中 / 替换建议」。
+  `--fix` 时按命中次序在 `replacements` 间轮换替换(避免全文一律),**结果需人工通读**。
+- `rhetoric`:按 `rhetoric_catalog` 统计每种手法的密度(每千字)与同标记词<200字重复,
+  超 `density_limit` 或重复则告警,并给出 `rotation_rule` 轮换建议。
+- `report`:综合输出 markdown(破折号密度 / 连续短句 / AI 味命中表 / 修辞密度表 / 轮换建议),
+  并写入 `style_audit_issues`、`rhetoric_usage` 两张结果表。
+- 破折号密度、连续短句数、明喻密度等上限由 `style_thresholds` 控制,可按项目硬规则改(如《红楼》破折号 ≤7/千字)。
+
 ## Perception 模型(perceptions 表)
 
 | ptype | 含义 | 用途 |
@@ -95,7 +127,10 @@ python scripts/report.py --db .novel-db/novel.db --out .novel-db/report.md
 
 ## References
 
-- `references/methodology.md` — RPG 状态库类比、四感知模型、读者信息差、完整工作流
-- `references/schema.md` — 各表字段速查与 SQL 示例
+- `references/methodology.md` — RPG 状态库类比、四感知模型、读者信息差、完整工作流、文学性管理理念
+- `references/schema.md` — 各表字段速查与 SQL 示例(含文学性 5 表)
 - `references/seed-honglou.json` — 《红楼》初始种子(对齐至 Ch10)
-- `scripts/schema.sql` — 完整 DDL
+- `references/rhetoric-catalog.json` — 修辞手法图谱(通用,可复用)
+- `references/ai-flavor-catalog.json` — AI 味写法谱系(通用,可复用)
+- `references/style-thresholds.json` — 风格阈值默认值(可逐项目覆盖)
+- `scripts/schema.sql` — 完整 DDL(16 张表)

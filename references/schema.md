@@ -16,6 +16,35 @@
 | timeline | 时间线 | datetime(ISO)/chapter_id/scene_id/event_summary/kind |
 | consistency_issues | 审计结果 | check_type/severity/error|warn|info/detail/detected_at/resolved |
 
+## 文学性表（降 AI 味 / 修辞轮换）
+
+| 表 | 用途 | 关键字段 |
+|----|------|---------|
+| rhetoric_catalog | 修辞手法图谱 | type/format_desc/connectors(JSON)/example/rotation_rule/density_limit |
+| ai_flavor_catalog | AI 味写法谱系 | code/category/severity/match_type/match/replacements(JSON)/auto_fix/rationale |
+| style_thresholds | 风格阈值(可覆盖) | name/value/unit/note |
+| style_audit_issues | 文学性审计结果 | chapter_id/issue_type(ai_flavor\|rhetoric\|dash\|short_sentence)/category/severity/line_no/detail/suggestion/resolved |
+| rhetoric_usage | 每章每类修辞计数 | chapter_id/device_type/count/density |
+
+### 文学性查询示例(SQL)
+
+```sql
+-- 某章 AI 味命中(按类别聚合)
+SELECT category, COUNT(*) n
+FROM style_audit_issues
+WHERE chapter_id=(SELECT id FROM chapters WHERE num=9)
+GROUP BY category ORDER BY n DESC;
+
+-- 全书的修辞密度分布
+SELECT device_type, SUM(count) total, ROUND(AVG(density),2) avg_density
+FROM rhetoric_usage GROUP BY device_type ORDER BY total DESC;
+
+-- 全局最常被触发的 AI 味写法
+SELECT code, category, COUNT(*) n
+FROM style_audit_issues WHERE issue_type='ai_flavor'
+GROUP BY code ORDER BY n DESC;
+```
+
 ## ptype 取值
 SEE 见 / HEAR 闻 / FEEL 感(情绪身体) / THINK 想(判断推断) / KNOW 已知事实 /
 SAY 言 / DO 行

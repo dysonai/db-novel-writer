@@ -204,11 +204,53 @@ def import_project(conn, root):
     print("  提示: best-effort 导入仅做实体占位, 建议再用 seed JSON 做精确填充。")
 
 
+# ---------- 文学性种子导入 ----------
+def seed_literary(conn, rhetoric_path, ai_path, th_path):
+    cur = conn.cursor()
+
+    with open(rhetoric_path, "r", encoding="utf-8") as f:
+        rh = json.load(f)
+    n_rh = 0
+    for d in rh.get("devices", []):
+        cur.execute(
+            "INSERT INTO rhetoric_catalog(type,format_desc,connectors,example,rotation_rule,density_limit) "
+            "VALUES(?,?,?,?,?,?)",
+            (d["type"], d.get("format_desc"), json.dumps(d.get("connectors", []), ensure_ascii=False),
+             d.get("example"), d.get("rotation_rule"), d.get("density_limit")))
+        n_rh += 1
+
+    with open(ai_path, "r", encoding="utf-8") as f:
+        af = json.load(f)
+    n_af = 0
+    for p in af.get("patterns", []):
+        cur.execute(
+            "INSERT INTO ai_flavor_catalog(code,category,severity,match_type,match,replacements,auto_fix,rationale) "
+            "VALUES(?,?,?,?,?,?,?,?)",
+            (p["code"], p.get("category"), p.get("severity"), p.get("match_type"), p.get("match"),
+             json.dumps(p.get("replacements", []), ensure_ascii=False), int(p.get("auto_fix", 0)),
+             p.get("rationale")))
+        n_af += 1
+
+    with open(th_path, "r", encoding="utf-8") as f:
+        th = json.load(f)
+    n_th = 0
+    for t in th.get("thresholds", []):
+        cur.execute(
+            "INSERT INTO style_thresholds(name,value,unit,note) VALUES(?,?,?,?)",
+            (t["name"], t["value"], t.get("unit"), t.get("note")))
+        n_th += 1
+
+    conn.commit()
+    print(f"[seed-literary] 已灌入: 修辞图谱{n_rh}  AI味谱系{n_af}  阈值{n_th}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", required=True, help="数据库文件路径")
     ap.add_argument("--seed", help="策展种子 JSON 路径")
     ap.add_argument("--project", help="项目根目录(从现有 md best-effort 导入)")
+    ap.add_argument("--seed-literary", action="store_true",
+                    help="灌入文学性种子(修辞图谱/AI味谱系/风格阈值), 从同目录 references 读取")
     args = ap.parse_args()
 
     os.makedirs(os.path.dirname(os.path.abspath(args.db)), exist_ok=True)
@@ -227,6 +269,13 @@ def main():
             print(f"[错误] 项目目录不存在: {args.project}", file=sys.stderr)
             sys.exit(1)
         import_project(conn, args.project)
+
+    if args.seed_literary:
+        skill_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        seed_literary(conn,
+                      os.path.join(skill_root, "references", "rhetoric-catalog.json"),
+                      os.path.join(skill_root, "references", "ai-flavor-catalog.json"),
+                      os.path.join(skill_root, "references", "style-thresholds.json"))
 
     conn.close()
     print(f"[完成] {datetime.now().isoformat(timespec='seconds')}")

@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "name": "AI 味写法谱系（中文小说）",
+    "version": "1.0",
+    "note": "来源：大规模语言模型在中立叙述/转场任务上的统计偏好——跨作者风格雷同、人类作家不会随机选用的写法。用于初稿完成后审查，并以更有人味的写法替换。证据是生成模型的语料偏好，非语法错误。auto_fix=1 的项在 literary_audit.py --fix 时按 replacements 列表轮换替换；auto_fix=0 仅告警，需人工判断。",
+    "replacement_strategy": "对字面匹配项按命中次序在 replacements 间轮换，避免全文一律替换成同一句。",
+    "usage": "init_db.py --seed-literary 会将其灌入 ai_flavor_catalog 表。"
+  },
+  "patterns": [
+    {
+      "code": "af-cold-ice",
+      "category": "冷感比喻簇",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "冷得像冰",
+      "replacements": ["下颌线绷紧了一瞬", "尾音压平了半分", "把杯沿转了半圈"],
+      "auto_fix": 1,
+      "rationale": "训练语料中“冷得像冰”作为情绪冷淡的默认比喻出现频率远超人类作家的随机选择；人类更倾向用具象动作替代抽象温度。"
+    },
+    {
+      "code": "af-cold-siberia",
+      "category": "冷感比喻簇",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "冷得像西伯利亚的寒风",
+      "replacements": ["声音里没有温度", "语气像淬过一遍凉水"],
+      "auto_fix": 1,
+      "rationale": "“西伯利亚的寒风”是英文 cold as a Siberian winter 的直译迁移，中文原生写作极少这样比喻。"
+    },
+    {
+      "code": "af-cold-voice-ice",
+      "category": "冷感比喻簇",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "声音冷得像冰",
+      "replacements": ["声音里结着一层霜", "尾音凉得没有回音"],
+      "auto_fix": 1,
+      "rationale": "与 af-cold-ice 同源，温度比喻的懒惰复用。"
+    },
+    {
+      "code": "af-gaze-torch",
+      "category": "目光比喻簇",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "目光如炬",
+      "replacements": ["抬眼盯住他", "视线在他脸上钉了两秒", "眼皮抬了抬，目光落过来"],
+      "auto_fix": 1,
+      "rationale": "“目光如炬”属成语化套话，AI 在描写专注/锐利目光时高频调用；人类多写具体视线动作。"
+    },
+    {
+      "code": "af-gaze-blade",
+      "category": "目光比喻簇",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "目光如刀锋",
+      "replacements": ["目光在他袖口停了一瞬", "视线像被什么刮了一下"],
+      "auto_fix": 1,
+      "rationale": "“目光如刀/如刀锋/像刀子”是训练语料中锐利目光的默认模板。"
+    },
+    {
+      "code": "af-gaze-deep",
+      "category": "目光比喻簇",
+      "severity": "info",
+      "match_type": "substring",
+      "match": "深邃的目光",
+      "replacements": ["目光在他脸上停了两秒", "眼神往下压了压"],
+      "auto_fix": 1,
+      "rationale": "“深邃”作为目光修饰词高度套路化，宜改为可观察的眼神变化。"
+    },
+    {
+      "code": "af-pause-noanswer",
+      "category": "停顿填充",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "没有立刻回答",
+      "replacements": ["指节叩了叩桌沿", "把茶杯转了半圈", "视线落向窗外"],
+      "auto_fix": 1,
+      "rationale": "“没有立刻回答/没有马上说话”是 AI 填充沉默的默认句式，用动作替代更有人味。"
+    },
+    {
+      "code": "af-pause-silent",
+      "category": "停顿填充",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "没有说话",
+      "replacements": ["只把文件推了过去", "喉结动了一下", "把笔帽慢慢合上"],
+      "auto_fix": 1,
+      "rationale": "“X 没有说话”式省略是模型回避写具体反应的偷懒写法。"
+    },
+    {
+      "code": "af-pause-air",
+      "category": "停顿填充",
+      "severity": "info",
+      "match_type": "substring",
+      "match": "空气凝固了",
+      "replacements": ["谁都没先开口", "只有服务器风扇在转", "沉默里听见自己的心跳"],
+      "auto_fix": 1,
+      "rationale": "“空气凝固/安静得能听见针落”是训练语料中的环境静默模板。"
+    },
+    {
+      "code": "af-not-but",
+      "category": "否定替换句式",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "不是[，,].{1,12}?而是",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“不是 A，而是 B”的对比框架被模型大量用于强行制造层次感；隔章再用，同一章内不重复。"
+    },
+    {
+      "code": "af-thatis",
+      "category": "概念-说明句式",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "也就是说",
+      "replacements": ["换句话说，就是", "直白点，", ""],
+      "auto_fix": 0,
+      "rationale": "“也就是说/换句话说/换言之”是模型向读者二次解释的标志，真人叙述少有。"
+    },
+    {
+      "code": "af-accurately",
+      "category": "概念-说明句式",
+      "severity": "info",
+      "match_type": "substring",
+      "match": "准确地说",
+      "replacements": ["其实，", "严格讲，", ""],
+      "auto_fix": 0,
+      "rationale": "“准确地说/严格来说”属元叙述套话，打断沉浸。"
+    },
+    {
+      "code": "af-intensify",
+      "category": "程度副词堆砌",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "(极其|十分|非常|格外|分外|异常)",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "程度副词是模型替代具体描写的惰性选择；用人物的动作/环境细节替代。"
+    },
+    {
+      "code": "af-slightly",
+      "category": "高频修饰词",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "(微微|轻轻|缓缓|稍稍)",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“微微/轻轻/缓缓”等弱化副词在模型笔下高频出现，宜替换为可感知的具体动作幅度。"
+    },
+    {
+      "code": "af-thus",
+      "category": "总结性旁白",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "(由此可见|不难看出|从某种意义上说|不得不承认|毫无疑问)",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "总结性旁白是模型替读者下结论的典型痕迹；把判断留给角色与读者。"
+    },
+    {
+      "code": "af-emotion-flash",
+      "category": "情绪标签直给",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "眼中闪过一丝",
+      "replacements": ["睫毛颤了一下", "瞳孔缩了缩", "视线偏开半寸"],
+      "auto_fix": 1,
+      "rationale": "“眼中闪过一丝 X”是情绪标签直给的懒惰写法，用面部/眼部微动作替代。"
+    },
+    {
+      "code": "af-emotion-show",
+      "category": "情绪标签直给",
+      "severity": "info",
+      "match_type": "substring",
+      "match": "露出一丝",
+      "replacements": ["嘴角动了动", "唇角压了压", "笑意没到眼底"],
+      "auto_fix": 1,
+      "rationale": "“露出一丝笑/苦笑”套路化，改具体表情肌动作。"
+    },
+    {
+      "code": "af-emotion-surge",
+      "category": "情绪标签直给",
+      "severity": "warn",
+      "match_type": "substring",
+      "match": "心中涌起一阵",
+      "replacements": ["胸口闷了一下", "喉咙发紧", "呼吸滞了半拍"],
+      "auto_fix": 1,
+      "rationale": "“心中涌起一阵 X”是模型表达情绪的内部直述，改生理反应更可信。"
+    },
+    {
+      "code": "af-dash",
+      "category": "破折号滥用",
+      "severity": "info",
+      "match_type": "substring",
+      "match": "——",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "破折号滥用是模型控制节奏的拐杖；非必要改逗号/句号（见 style_thresholds.dash_per_1k）。"
+    }
+  ]
+}

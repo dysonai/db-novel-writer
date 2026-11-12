@@ -163,3 +163,71 @@ CREATE INDEX idx_perc_scene ON perceptions(scene_id);
 CREATE INDEX idx_scene_chap ON scenes(chapter_id);
 CREATE INDEX idx_tl_dt ON timeline(datetime);
 CREATE INDEX idx_fs_code ON foreshadowing(code);
+
+-- ============================================================
+-- 文学性管理(降AI味 / 修辞轮换) -- 第二真相源
+-- 把"怎么写更有人味"也格式化为可查询、可校验的数据
+-- ============================================================
+
+-- 修辞手法图谱: 每种手法的形式 / 标记词 / 轮换规则 / 密度上限 ----
+CREATE TABLE rhetoric_catalog (
+    id            INTEGER PRIMARY KEY,
+    type          TEXT UNIQUE NOT NULL,   -- 明喻/暗喻/拟人/排比/通感/夸张/反问/对偶/反复/借代/反语/移就
+    format_desc   TEXT,                    -- 该手法的形式定义
+    connectors    TEXT,                    -- JSON 数组: 典型标记词(如 明喻的 像/如/如同)
+    example       TEXT,                    -- 示例
+    rotation_rule TEXT,                    -- 同手法内用词轮换规则
+    density_limit REAL                     -- 每千字建议上限(超则告警); 0/NULL=不限制
+);
+
+-- AI 味写法谱系: 训练语料偏好的组合/句式/标点 -------------------
+CREATE TABLE ai_flavor_catalog (
+    id            INTEGER PRIMARY KEY,
+    code          TEXT UNIQUE NOT NULL,    -- af-cold-ice ...
+    category      TEXT,                    -- 冷感比喻簇/目光比喻簇/停顿填充/否定替换句式...
+    severity      TEXT,                    -- warn/info
+    match_type    TEXT,                    -- substring/regex
+    match         TEXT,                    -- 匹配串或正则
+    replacements  TEXT,                    -- JSON 数组: 轮换替换候选(仅 substring + auto_fix=1 时用于 --fix)
+    auto_fix      INTEGER DEFAULT 0,       -- 1=允许自动替换, 0=仅告警(需语境判断)
+    rationale     TEXT                     -- 为何属 AI 味(语料证据)
+);
+
+-- 文学性风格阈值(可逐项目覆盖) -------------------------------
+CREATE TABLE style_thresholds (
+    id            INTEGER PRIMARY KEY,
+    name          TEXT UNIQUE NOT NULL,    -- dash_per_1k / simile_per_1k / consecutive_short_sent ...
+    value         REAL NOT NULL,
+    unit          TEXT,
+    note          TEXT
+);
+
+-- 文学性审计结果(落库) ---------------------------------------
+CREATE TABLE style_audit_issues (
+    id            INTEGER PRIMARY KEY,
+    chapter_id    INTEGER,
+    issue_type    TEXT,                    -- ai_flavor/rhetoric/dash/short_sentence
+    category      TEXT,
+    severity      TEXT,                    -- warn/info
+    line_no       INTEGER,
+    detail        TEXT,
+    suggestion    TEXT,
+    detected_at   TEXT,
+    resolved      INTEGER DEFAULT 0,
+    FOREIGN KEY(chapter_id) REFERENCES chapters(id)
+);
+
+-- 修辞手法实际使用统计(每章每类计数) -------------------------
+CREATE TABLE rhetoric_usage (
+    id            INTEGER PRIMARY KEY,
+    chapter_id    INTEGER NOT NULL,
+    device_type   TEXT NOT NULL,
+    count         INTEGER NOT NULL,
+    density       REAL,                    -- count per 1k chars
+    FOREIGN KEY(chapter_id) REFERENCES chapters(id)
+);
+
+-- 文学性索引 ------------------------------------------------
+CREATE INDEX idx_af_code ON ai_flavor_catalog(code);
+CREATE INDEX idx_sai_chap ON style_audit_issues(chapter_id);
+CREATE INDEX idx_ru_chap ON rhetoric_usage(chapter_id);
