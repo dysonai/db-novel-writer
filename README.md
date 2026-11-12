@@ -77,13 +77,13 @@ db-novel-writer/
 ├── LICENSE                       # MIT
 ├── .gitignore
 ├── scripts/
-│   ├── schema.sql                # 16 张表 DDL（11 一致性 + 5 文学性）
+│   ├── schema.sql                # 17 张表 DDL（11 一致性 + 6 文学性）
 │   ├── init_db.py                # 建库 + 种子导入 / 文学性种子 / 从现有 md best-effort 导入
 │   ├── capture.py                # 场景抽取 JSON → 入库（幂等）
 │   ├── query.py                  # knowledge/prop/timeline/foreshadowing/scene/who
 │   ├── audit.py                  # 5 项一致性检查
 │   ├── report.py                 # 生成 markdown 一致性看板
-│   └── literary_audit.py        # 文学性审查：ai-flavor / rhetoric / report 三个子命令
+│   └── literary_audit.py        # 文学性审查：ai-flavor / rhetoric / report / techniques 四个子命令
 └── references/
     ├── methodology.md            # RPG 隐喻、四感知模型、读者信息差、完整工作流、文学性管理理念
     ├── schema.md                 # 字段速查 + SQL 示例
@@ -91,15 +91,16 @@ db-novel-writer/
     ├── example_scene_ch11.json   # 场景抓取 JSON 样例
     ├── rhetoric-catalog.json     # 修辞手法图谱（通用，可复用）
     ├── ai-flavor-catalog.json    # AI 味写法谱系（通用，可复用）
-    └── style-thresholds.json     # 风格阈值默认值（可逐项目覆盖）
+    ├── style-thresholds.json     # 风格阈值默认值（可逐项目覆盖）
+    └── writing-techniques.json   # 写作手法图谱（通用，可复用；不止修辞）
 ```
 
 ## 数据模型（要点）
 
-16 张表：11 张一致性表（`characters` / `locations` / `chapters` / `scenes` / `perceptions` /
+17 张表：11 张一致性表（`characters` / `locations` / `chapters` / `scenes` / `perceptions` /
 `props` / `prop_transfers` / `events` / `foreshadowing` / `timeline` / `consistency_issues`）
-+ 5 张文学性表（`rhetoric_catalog` / `ai_flavor_catalog` / `style_thresholds` /
-`style_audit_issues` / `rhetoric_usage`）。
++ 6 张文学性表（`rhetoric_catalog` / `ai_flavor_catalog` / `style_thresholds` /
+`writing_techniques` / `style_audit_issues` / `rhetoric_usage`）。
 
 `perceptions` 是核心：
 
@@ -125,9 +126,10 @@ CREATE TABLE perceptions (
 - **修辞手法图谱 `rhetoric_catalog`**：每种手法（明喻/暗喻/拟人/排比/通感/夸张/反问/对偶/反复/借代/反语/移就）记录其**形式、标记词、轮换规则、密度上限**。`literary_audit.py rhetoric` 据此统计实际密度，超上限或同词近距离重复时给出轮换建议——回答"每种格式用哪些词、这些词该怎么轮换"。
 - **AI 味写法谱系 `ai_flavor_catalog`**：先调查哪些**文字组合 / 写作方式 / 标点符号**是 AI 训练语料的统计偏好（冷感比喻簇、目光比喻簇、停顿填充、否定替换句式、概念-说明句式、程度副词堆砌、情绪标签直给……），把证据记进库；初稿完成后用 `literary_audit.py ai-flavor` 审查，**以查找替换的方式把 AI 味写法改成更有人味的样式**（`--fix` 按命中次序轮换替换，结果需人工通读）。
 - **风格阈值 `style_thresholds`**：破折号每千字上限、明喻密度、连续短句数等——可逐项目覆盖（如《红楼》破折号 ≤7/千字），不写死在代码里。
+- **写作手法图谱 `writing_techniques`**：不止于修辞——把"怎么把人和事讲明白"也格式化为数据：遣词造句（精准动词 / 删程度副词 / 长短句交替）、引经据典、细节填充、展示不告知、对话（动作标签 / 潜台词）、视角RPG（第三人称旁观记录 / 第一人称当事人回想）、节奏、钩子、环境烘托、伏笔。每条带 `detectors` 机检"反模式命中"；`literary_audit.py techniques` 据此给出手法覆盖检查。
 - **结果落库**：审计结果写入 `style_audit_issues`，修辞计数写入 `rhetoric_usage`，可像一致性问题一样持续追踪。
 
-三份文学性参考 JSON（`rhetoric-catalog.json` / `ai-flavor-catalog.json` / `style-thresholds.json`）是**通用数据**，换项目无需改动，只调 `style_thresholds` 即可。
+四份文学性参考 JSON（`rhetoric-catalog.json` / `ai-flavor-catalog.json` / `style-thresholds.json` / `writing-techniques.json`）是**通用数据**，换项目无需改动，只调 `style_thresholds` 即可。
 
 ```bash
 # 一键去味：把 AI 味写法轮换替换为更有人味的样式
@@ -135,6 +137,9 @@ python scripts/literary_audit.py ai-flavor --db novel.db --text-file draft.md --
 
 # 综合文学性报告
 python scripts/literary_audit.py report --db novel.db --text-file 第011章.md --out 文学性审计.md --chapter 11
+
+# 写作手法覆盖检查（不止修辞）
+python scripts/literary_audit.py techniques --db novel.db --text-file 第011章.md --out 手法覆盖.md
 ```
 
 ## 边界

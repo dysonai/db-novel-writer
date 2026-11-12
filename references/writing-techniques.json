@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "name": "写作手法图谱（长篇小说通用）",
+    "version": "1.0",
+    "note": "不止于修辞。把'怎么把人和事讲明白'也格式化为可查询、可校验的数据：遣词造句、引经据典、细节填充、展示不告知、对话、视角(RPG)、节奏、钩子、环境烘托、伏笔。每条含 说明/何时用/反模式(AI倾向)/示例/轮换；带 detectors 的可由 literary_audit.py techniques 子命令机检反模式命中。detectors 为空=人工核查项。",
+    "rpg_mapping": "视角是这套手法的'操作范式'：第三人称限知/外视角 = 旁观者在记录发生在角色身上的事情（只写观察者能看见/听见/推断的）；第一人称回顾性限知 = 当事人在回想发生在自己身上的事情（可带事后评判，但不可知他人彼时内心）。逻辑推进剧情靠'事件→感知→反应'的因果链，而非作者旁白代劳。",
+    "usage": "init_db.py --seed-literary 会将其灌入 writing_techniques 表；literary_audit.py techniques [--text-file X] 列图谱或机检反模式命中。"
+  },
+  "techniques": [
+    {
+      "code": "wt-show-dont-tell",
+      "category": "展示不告知",
+      "name": "展示不告知",
+      "summary": "用可观察的动作、生理反应、环境变化来传递情绪与状态，而非直接命名情绪。",
+      "when_use": "任何需要读者'感受'人物情绪的场合；尤其是高潮与转折。",
+      "anti_pattern": "情绪标签直给——'眼中闪过一丝X''心中涌起一阵X''露出一丝X''只觉得X'。这是 AI/新手最易犯的笔病，等于替读者下结论。",
+      "example": "原'她心中涌起一阵不安' → 改'她把杯沿转了半圈，没接话'。",
+      "rotation": "写具体动作/微表情/生理反应（喉结、指尖、呼吸、视线落点）；把判断权交还读者。",
+      "detectors": [
+        {"match_type": "substring", "match": "眼中闪过一丝"},
+        {"match_type": "substring", "match": "露出一丝"},
+        {"match_type": "substring", "match": "心中涌起一阵"},
+        {"match_type": "substring", "match": "只觉得"},
+        {"match_type": "substring", "match": "感到一阵"},
+        {"match_type": "substring", "match": "心头一紧"}
+      ]
+    },
+    {
+      "code": "wt-precise-verb",
+      "category": "遣词造句",
+      "name": "精准动词",
+      "summary": "用具体、有画面感的动词替代'是/有/觉得/显得/好像'等弱化陈述。",
+      "when_use": "描述人物动作、状态变化时。",
+      "anti_pattern": "弱化陈述动词——'他觉得很累''显得很平静''似乎在犹豫'。AI 倾向用模糊动词+副词搪塞具体动作。",
+      "example": "原'他显得很紧张' → 改'他指节把文件边捏出了褶'。",
+      "rotation": "动词落到具体肌群/物件上；名词化动作优于形容词。",
+      "detectors": [
+        {"match_type": "substring", "match": "觉得"},
+        {"match_type": "substring", "match": "显得"},
+        {"match_type": "substring", "match": "似乎在"},
+        {"match_type": "substring", "match": "好像在"},
+        {"match_type": "substring", "match": "仿佛在"},
+        {"match_type": "substring", "match": "看上去"}
+      ]
+    },
+    {
+      "code": "wt-cut-adverb",
+      "category": "遣词造句",
+      "name": "删程度副词",
+      "summary": "删去'很/非常/十分/异常/格外'等程度副词，用细节替代强度。",
+      "when_use": "任何想强调程度时。",
+      "anti_pattern": "程度副词堆砌——'极其安静''十分危险''异常寒冷'。这是模型替代具体描写的惰性选择。",
+      "example": "原'房间里十分安静' → 改'只有服务器风扇在转'。",
+      "rotation": "用可感知的细节（声音/温度/光线/动作幅度）标定强度。",
+      "detectors": [
+        {"match_type": "regex", "match": "(极其|十分|非常|格外|分外|异常|特别|极为)"}
+      ]
+    },
+    {
+      "code": "wt-sentence-rhythm",
+      "category": "遣词造句",
+      "name": "长短句交替",
+      "summary": "长句铺陈信息，短句钉入节奏；二者交替形成呼吸感。",
+      "when_use": "紧张场景用短句提速，抒情/说明用长句延展。",
+      "anti_pattern": "断奏依赖——连续 ≤6 字短句堆叠（机械断奏）；或通篇长句无停顿。",
+      "example": "'他拆开外壳。他读出波形。他听见呼吸。' → '他拆开外壳，读出波形，听见芯片在呼吸。'",
+      "rotation": "三连短句内至少并入一处长句或加一个动作细节；长句超 40 字宜断开。",
+      "detectors": []
+    },
+    {
+      "code": "wt-allusion",
+      "category": "引经据典",
+      "name": "化用诗词",
+      "summary": "将古诗文意象自然化入叙事，增厚度而不炫技。",
+      "when_use": "景物点染、情绪遥应、章节题眼。",
+      "anti_pattern": "生硬掉书袋——为用而用、与情境脱节；或角色自知典故（本项目'恰好主义'设定：角色不自引红楼/古诗，典故只作读者视角）。",
+      "example": "写雨夜孤身 → '檐声一夜，像谁在数旧账'（意象化用，不点名）。",
+      "rotation": "取意象而非成句；一处足矣，忌连篇累牍。",
+      "detectors": []
+    },
+    {
+      "code": "wt-detail-five",
+      "category": "细节填充",
+      "name": "五维细节填充",
+      "summary": "通过外貌/语言/动作/神态/心理的具体细节让人物立住，替代概括性形容词。",
+      "when_use": "人物首次出场、关键反应、关系转折。",
+      "anti_pattern": "概括性叙述——'她很漂亮''他是个好人''气氛很尴尬'。",
+      "example": "原'她很紧张' → 改'她把刘海别到耳后，第三次看表'。",
+      "rotation": "选一个最见性格的细节维度深挖，不面面俱到。",
+      "detectors": []
+    },
+    {
+      "code": "wt-dialog-action",
+      "category": "对话",
+      "name": "对话·动作标签",
+      "summary": "用具体动作承载对话，而非用副词包装'说'。",
+      "when_use": "每句台词前后的动作/神态。",
+      "anti_pattern": "副词包装对话——'他坚定地说''她轻声地问''他冷笑地答'。AI 偏好'XX地说'塞情绪。",
+      "example": "原'他坚定地说：我留下。' → 改'他把手套拍在桌上：我留下。'",
+      "rotation": "动作要与情绪一致且可观察；无声动作常胜千言。",
+      "detectors": [
+        {"match_type": "substring", "match": "地说"},
+        {"match_type": "substring", "match": "地问道"},
+        {"match_type": "substring", "match": "地喊道"},
+        {"match_type": "substring", "match": "地笑了笑"},
+        {"match_type": "substring", "match": "地答道"},
+        {"match_type": "substring", "match": "地回应"}
+      ]
+    },
+    {
+      "code": "wt-dialog-subtext",
+      "category": "对话",
+      "name": "对话·潜台词",
+      "summary": "角色说的话 ≠ 心里想的；让台词承载言外之意。",
+      "when_use": "冲突、试探、隐瞒、反讽。",
+      "anti_pattern": "对话直给结论——把心理活动全念出来，失去博弈感。",
+      "example": "原'其实我害怕' → 改'……明天还来吗？他没看她。'",
+      "rotation": "用回避、反问、岔开、半句留白制造张力。",
+      "detectors": []
+    },
+    {
+      "code": "wt-pov-third",
+      "category": "视角RPG",
+      "name": "第三人称·旁观记录",
+      "summary": "第三人称限知/外视角 = 旁观者在记录发生在角色身上的事；只写观察者能看见/听见/推断的。",
+      "when_use": "主线叙事、多线切换、悬疑视角限制。",
+      "anti_pattern": "全知上帝灌水——随意跳进任意角色脑内；或旁观者突然代角色抒情。",
+      "example": "黛玉看见他指尖颤了一下（可见），猜他怕了（可推断）；不写'他内心恐惧'（不可见）。",
+      "rotation": "严格按当前 POV 的可知边界；跨脑需明确转场。本项目以 chapters.pov_character_id 约束。",
+      "detectors": []
+    },
+    {
+      "code": "wt-pov-first",
+      "category": "视角RPG",
+      "name": "第一人称·当事人回想",
+      "summary": "第一人称回顾性限知 = 当事人在回想发生在自己身上的事；可带事后评判，但不可知他人彼时内心。",
+      "when_use": "回忆录体、侦探自述、内心独白。",
+      "anti_pattern": "当下实时感错配——用现在时伪装全知；或回忆口吻忽而跳成上帝。",
+      "example": "我记得那年焊台的光（回想），却不知道他已在门外（限知）。",
+      "rotation": "用'当时/如今'锚定时间层；不确定处明说'后来才知'。",
+      "detectors": []
+    },
+    {
+      "code": "wt-pacing",
+      "category": "节奏",
+      "name": "节奏·五档变速",
+      "summary": "省略（跳时间）/概要（压缩叙述）/场景（实时对话动作）/延缓（拉长细节）/停顿（聚焦一物）。五档控制叙事速度。",
+      "when_use": "全篇结构；高潮用场景/延缓，过渡用省略/概要。",
+      "anti_pattern": "匀速流水账——每段同等密度，无快慢。",
+      "example": "旅途用'三天后他到了'（省略）；对峙用逐秒动作（场景）。",
+      "rotation": "一张一弛；先定本章节奏档，再落笔。",
+      "detectors": []
+    },
+    {
+      "code": "wt-hook",
+      "category": "钩子",
+      "name": "章节钩子",
+      "summary": "章末留悬念/反转/新疑问，把读者拽进下一章；章首亦可用钩子破空而入。",
+      "when_use": "每章收尾（及分卷）。",
+      "anti_pattern": "章末平淡收束——'这一天就这样结束了'式泄气。",
+      "example": "章末'她按下回车。屏幕亮了——是父亲七年前的签名。'（钩子+呼应伏笔）",
+      "rotation": "钩子要扣已埋伏笔，忌无源惊吓。",
+      "detectors": []
+    },
+    {
+      "code": "wt-mood-environment",
+      "category": "环境烘托",
+      "name": "环境烘托",
+      "summary": "用环境物候映射人物情绪，而非直说心情。",
+      "when_use": "情绪转折、孤独、压迫、希望。",
+      "anti_pattern": "景物堆砌无指向——漂亮但和人物无关；或'天哭了=她哭了'式直喻。",
+      "example": "原'她很绝望' → 改'窗外那盏路灯坏了三天，今夜终于亮了。'",
+      "rotation": "环境要与人物的某个具体处境共振；一笔即可。",
+      "detectors": []
+    },
+    {
+      "code": "wt-foreshadow",
+      "category": "伏笔",
+      "name": "伏笔·埋收对称",
+      "summary": "前文埋设的细节/物件/台词，在后续章节回收；埋收间距与方式需设计。",
+      "when_use": "长线悬疑、人物关系、道具。",
+      "anti_pattern": "有埋无收（烂尾伏笔）或临时硬塞回收（机械降神）。",
+      "example": "Ch3 黛玉注意到芯片焊点异常 → Ch9 拆解证实是后门（收）。",
+      "rotation": "每个伏笔记 code/埋设章/预计回收章；本项目以 foreshadowing 表追踪。",
+      "detectors": []
+    }
+  ]
+}

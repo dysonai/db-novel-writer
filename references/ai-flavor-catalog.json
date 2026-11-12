@@ -1,8 +1,8 @@
 {
   "meta": {
     "name": "AI 味写法谱系（中文小说）",
-    "version": "1.0",
-    "note": "来源：大规模语言模型在中立叙述/转场任务上的统计偏好——跨作者风格雷同、人类作家不会随机选用的写法。用于初稿完成后审查，并以更有人味的写法替换。证据是生成模型的语料偏好，非语法错误。auto_fix=1 的项在 literary_audit.py --fix 时按 replacements 列表轮换替换；auto_fix=0 仅告警，需人工判断。",
+    "version": "1.1",
+    "note": "来源：大规模语言模型在中立叙述/转场任务上的统计偏好——跨作者风格雷同、人类作家不会随机选用的写法。用于初稿完成后审查，并以更有人味的写法替换。证据是生成模型的语料偏好，非语法错误。auto_fix=1 的项在 literary_audit.py --fix 时按 replacements 列表轮换替换；auto_fix=0 仅告警，需人工判断。v1.1 新增：躯体反应套话（脊背一凉/心猛地一跳/倒吸一口凉气等英文 cliché 迁移）、叙述腔调痕迹（命运的齿轮/殊不知/内心坍塌）、对话包装套话（XX地说/意味深长地/嘴角勾起一抹）、总结性宣告（终于明白/这意味着）、模糊修辞（莫名地/仿佛某种）、设问钩子、列举收束、转场腔——来源覆盖 SYMBAN/Sudowrite/Bloomberry 等 AI-Slop 研究。",
     "replacement_strategy": "对字面匹配项按命中次序在 replacements 间轮换，避免全文一律替换成同一句。",
     "usage": "init_db.py --seed-literary 会将其灌入 ai_flavor_catalog 表。"
   },
@@ -196,6 +196,186 @@
       "replacements": [],
       "auto_fix": 0,
       "rationale": "破折号滥用是模型控制节奏的拐杖；非必要改逗号/句号（见 style_thresholds.dash_per_1k）。"
+    },
+    {
+      "code": "af-spine-chill",
+      "category": "躯体反应套话",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "脊背一凉|后脊发凉|背脊发冷|脊背发冷",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“脊背一凉/后脊发凉”是英文 shiver down one's spine 的迁移，模型描写恐惧/寒意时的默认躯体反应，人类更写具体环境降温或动作。"
+    },
+    {
+      "code": "af-heart-jump",
+      "category": "躯体反应套话",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "心脏猛地一跳|心猛地一跳|心跳如鼓|心头像",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“心猛地一跳/心跳如鼓”是模型描写惊吓的高频套话，heart hammered 的中文直译，宜改为可观察的生理反应（喉结、指尖、呼吸）。"
+    },
+    {
+      "code": "af-jaw-tighten",
+      "category": "躯体反应套话",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "下颌绷紧|牙关紧咬|腮帮子绷紧",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“下颌绷紧/牙关紧咬”是 jaw tightened 的迁移，模型表达隐忍/愤怒的懒惰复用，有时反而削弱了真实张力。"
+    },
+    {
+      "code": "af-breath-catch",
+      "category": "躯体反应套话",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "呼吸一滞|倒吸一口凉气|呼吸滞了",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“倒吸一口凉气/呼吸一滞”是模型填充震惊的默认句式；本项目硬规则也将其列为禁词，宜改为具体动作（顿住、视线定格）。"
+    },
+    {
+      "code": "af-fist-clench",
+      "category": "躯体反应套话",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "不自觉地攥紧|指节发白|指节捏得",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“不自觉地攥紧/指节发白”是模型表达压抑情绪的套路化动作，连续出现易显匠气。"
+    },
+    {
+      "code": "af-fate-gear",
+      "category": "叙述腔调痕迹",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "命运的齿轮|冥冥之中|一切都在悄然",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“命运的齿轮开始转动/冥冥之中”是 AI 旁白强行升华的痕迹，把巧合包装成宿命，打断沉浸。"
+    },
+    {
+      "code": "af-little-did-he-know",
+      "category": "叙述腔调痕迹",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "殊不知|他并不知道[，,]但",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“little did he know / 殊不知”是模型预告反转的经典旁白套话；本项目硬规则也将“殊不知”列为禁词。"
+    },
+    {
+      "code": "af-something-broke",
+      "category": "叙述腔调痕迹",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "有什么东西在.{0,6}碎了|内心某处坍塌|心里某个角落塌了",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“something inside him broke / 内心某处坍塌”是模型描写心理崩塌的隐喻模板，直给抽象破坏感。"
+    },
+    {
+      "code": "af-meaningful-look",
+      "category": "对话包装套话",
+      "severity": "info",
+      "match_type": "substring",
+      "match": "意味深长地",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“意味深长地看了他一眼”是 dialogue tell，用副词替读者点明言外之意，不如写具体眼神落点或动作。"
+    },
+    {
+      "code": "af-said-adverb",
+      "category": "对话包装套话",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "(坚定|沉声|冷冷|轻轻|淡淡|意味深长)地(说|道|问|答|笑了笑)",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“XX地说/道”用副词包装对话情绪，是 AI 对话最大宗的 tell 之一；应改为动作承载情绪（把手套拍在桌上）。"
+    },
+    {
+      "code": "af-smile-played",
+      "category": "对话包装套话",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "嘴角勾起一抹|一抹笑意浮上|唇角勾起",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“a smile played on his lips / 嘴角勾起一抹笑”是模型描写笑的默认模板，套路化且常无信息量。"
+    },
+    {
+      "code": "af-finally-understand",
+      "category": "总结性宣告",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "这一刻他终于明白|他忽然意识到|他恍然(大悟|明白|醒悟)|他终于懂了",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“这一刻他终于明白/他忽然意识到”是 meaning-announcer，模型替角色把感悟说出来，剥夺了读者自己领悟的空间。"
+    },
+    {
+      "code": "af-it-means",
+      "category": "总结性宣告",
+      "severity": "info",
+      "match_type": "substring",
+      "match": "这意味着",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“这意味着”是模型向下一句做总结性旁白的开头，打断叙事流。"
+    },
+    {
+      "code": "af-somehow",
+      "category": "模糊修辞",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "莫名(地|的)|不知为何|说不清道不明|某种说不清",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“somehow / 莫名地 / 不知为何”是模型掩饰因果缺失的模糊修辞，用神秘感填补逻辑空白。"
+    },
+    {
+      "code": "af-almost-as-if",
+      "category": "模糊修辞",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "仿佛某种|好像有什么在|像是被什么",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“almost as if / 仿佛某种说不清的力量”是模型制造氛围但回避具体描写的 hedging，弱化叙事确定性。"
+    },
+    {
+      "code": "af-rhetorical-hook",
+      "category": "设问钩子",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "你可曾|有没有那么一瞬间|试问[，,]?|谁又能想到",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“你可曾想过 / have you ever wondered”是 AI 文章开头/章首的设问钩子套路，小说正文里用易出戏。"
+    },
+    {
+      "code": "af-rule-of-three",
+      "category": "列举收束",
+      "severity": "info",
+      "match_type": "regex",
+      "match": "第一[，,].{0,10}第二[，,].{0,10}第三",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“第一…第二…第三…”是模型强行结构化叙述的 rule-of-three，技术说明里可用，叙事里滥用显匠气、打断节奏。"
+    },
+    {
+      "code": "af-transition-phrase",
+      "category": "转场腔",
+      "severity": "warn",
+      "match_type": "regex",
+      "match": "在这个.{0,12}的时代|不得不说|值得一提的是|毋庸置疑",
+      "replacements": [],
+      "auto_fix": 0,
+      "rationale": "“in today's fast-paced world / 在这个…的时代 / 值得一提的是”是 AI 通用写作的转场腔（Bloomberry 称 AI Sentence DNA），正文里属出戏旁白。"
     }
   ]
 }

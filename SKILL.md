@@ -32,9 +32,9 @@ python scripts/init_db.py --db .novel-db/novel.db \
     --seed-literary
 ```
 - `--seed`:灌入策展种子(本项目已备 `seed-honglou.json`,对齐 V01–V22/时间线/道具/人物)
-- `--seed-literary`:灌入**文学性种子**——修辞手法图谱(`rhetoric-catalog.json`)、AI 味写法谱系(`ai-flavor-catalog.json`)、风格阈值(`style-thresholds.json`)。这三份是**通用可复用**数据,换项目不必改
+- `--seed-literary`:灌入**文学性种子**——修辞手法图谱(`rhetoric-catalog.json`)、AI 味写法谱系(`ai-flavor-catalog.json`)、风格阈值(`style-thresholds.json`)、写作手法图谱(`writing-techniques.json`)。这四份是**通用可复用**数据,换项目不必改
 - 也可用 `--project "D:/Claw/IntellectualProperties/红楼悬疑"` 从现有 md best-effort 导入占位
-- schema 从 `scripts/schema.sql` 读取(共 16 张表:11 张一致性 + 5 张文学性)
+- schema 从 `scripts/schema.sql` 读取(共 17 张表:11 张一致性 + 6 张文学性)
 
 ### 2. 动笔前:查状态(避免写飞)
 ```bash
@@ -88,12 +88,20 @@ python scripts/literary_audit.py rhetoric --db .novel-db/novel.db --text-file �
 # 综合 markdown 审计报告(并落库 style_audit_issues / rhetoric_usage)
 python scripts/literary_audit.py report --db .novel-db/novel.db \
     --text-file 第009章-结盟.md --out .novel-db/lit-audit.md --chapter 9
+
+# 写作手法图谱(不止修辞): 列图谱 / 机检正文反模式命中
+python scripts/literary_audit.py techniques --db .novel-db/novel.db
+python scripts/literary_audit.py techniques --db .novel-db/novel.db \
+    --text-file 第011章.md --out .novel-db/technique-check.md
 ```
 
-- `ai-flavor`:扫描 `ai_flavor_catalog` 谱系,输出「行:列 / 类别 / 命中 / 替换建议」。
+- `ai-flavor`:扫描 `ai_flavor_catalog` 谱系(冷感比喻簇/目光比喻簇/停顿填充/概念-说明句式/程度副词堆砌/情绪标签直给/破折号/躯体反应套话/叙述腔调痕迹/对话包装套话/总结性宣告/模糊修辞/设问钩子/列举收束/转场腔),输出「行:列 / 类别 / 命中 / 替换建议」。
   `--fix` 时按命中次序在 `replacements` 间轮换替换(避免全文一律),**结果需人工通读**。
 - `rhetoric`:按 `rhetoric_catalog` 统计每种手法的密度(每千字)与同标记词<200字重复,
   超 `density_limit` 或重复则告警,并给出 `rotation_rule` 轮换建议。
+- `techniques`:列出 `writing_techniques` 图谱(遣词造句/引经据典/细节填充/展示不告知/对话/视角RPG/节奏/钩子/环境烘托/伏笔);
+  给定 `--text-file` 时,对带 `detectors` 的手法机检"反模式命中"(如情绪标签直给、弱化动词、程度副词、副词包装对话),
+  输出覆盖检查 markdown。无 detectors 的手法列为人工核查项。
 - `report`:综合输出 markdown(破折号密度 / 连续短句 / AI 味命中表 / 修辞密度表 / 轮换建议),
   并写入 `style_audit_issues`、`rhetoric_usage` 两张结果表。
 - 破折号密度、连续短句数、明喻密度等上限由 `style_thresholds` 控制,可按项目硬规则改(如《红楼》破折号 ≤7/千字)。
@@ -133,4 +141,5 @@ python scripts/literary_audit.py report --db .novel-db/novel.db \
 - `references/rhetoric-catalog.json` — 修辞手法图谱(通用,可复用)
 - `references/ai-flavor-catalog.json` — AI 味写法谱系(通用,可复用)
 - `references/style-thresholds.json` — 风格阈值默认值(可逐项目覆盖)
-- `scripts/schema.sql` — 完整 DDL(16 张表)
+- `references/writing-techniques.json` — 写作手法图谱(通用,可复用; 不止修辞)
+- `scripts/schema.sql` — 完整 DDL(17 张表)

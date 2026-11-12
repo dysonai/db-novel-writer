@@ -64,6 +64,51 @@ def load_catalogs(conn):
     return af, rh, th
 
 
+def load_techniques(conn):
+    cur = conn.cursor()
+    out = []
+    for row in cur.execute(
+        "SELECT code,category,name,summary,when_use,anti_pattern,example,rotation,detectors "
+        "FROM writing_techniques"):
+        out.append({
+            "code": row[0], "category": row[1], "name": row[2], "summary": row[3],
+            "when_use": row[4], "anti_pattern": row[5], "example": row[6],
+            "rotation": row[7],
+            "detectors": json.loads(row[8]) if row[8] else []})
+    return out
+
+
+def scan_techniques(text, techs):
+    """对每个带 detectors 的手法, 统计反模式命中数(全文本扫描, 不分行)。"""
+    results = []
+    for t in techs:
+        hits = 0
+        samples = []
+        for d in t["detectors"]:
+            m = d["match"]
+            if d["match_type"] == "regex":
+                try:
+                    pat = re.compile(m)
+                except re.error:
+                    continue
+                for mm in pat.finditer(text):
+                    hits += 1
+                    if len(samples) < 3:
+                        samples.append(mm.group(0))
+            else:
+                start = 0
+                while True:
+                    idx = text.find(m, start)
+                    if idx < 0:
+                        break
+                    hits += 1
+                    if len(samples) < 3:
+                        samples.append(m)
+                    start = idx + len(m)
+        results.append({"tech": t, "hits": hits, "samples": samples})
+    return results
+
+
 def char_count(text):
     """去空白后的中文字数(密度分母)。"""
     return len(re.sub(r"\s", "", text))
@@ -371,6 +416,74 @@ def cmd_report(args, conn, af, rh, th):
     write_report_md(out, os.path.basename(args.text_file), total, findings, results, dash, short, th)
 
 
+def _print_technique_cards(techs):
+    by_cat = {}
+    for t in techs:
+        by_cat.setdefault(t["category"], []).append(t)
+    print(f"\n=== 写作手法图谱({len(techs)} 项, {len(by_cat)} 类) ===")
+    for cat, items in by_cat.items():
+        print(f"\n▍{cat}")
+        for t in items:
+            det = "可机检" if t["detectors"] else "人工核查"
+            print(f"  · {t['name']} [{t['code']}] ({det})")
+            print(f"      说明: {t['summary']}")
+            print(f"      何时用: {t['when_use']}")
+            print(f"      反模式: {t['anti_pattern']}")
+            print(f"      示例: {t['example']}")
+            print(f"      轮换: {t['rotation']}")
+
+
+def _write_technique_md(path, src_name, results, techs):
+    by_cat = {}
+    for t in techs:
+        by_cat.setdefault(t["category"], []).append(t)
+    lines = [f"# 写作手法覆盖检查 — {src_name}\n"]
+    lines.append(f"- 手法总数: {len(techs)}（可机检 {sum(1 for t in techs if t['detectors'])} 项 / 人工核查 {sum(1 for t in techs if not t['detectors'])} 项）\n")
+    lines.append("## 一、可机检项 · 反模式命中\n")
+    any_hit = False
+    for r in results:
+        if r["hits"]:
+            any_hit = True
+            t = r["tech"]
+            lines.append(f"- ⚠ **{t['name']}**（{t['category']}）：反模式命中 {r['hits']} 处")
+            lines.append(f"  - 样本: {', '.join(r['samples'])}")
+            lines.append(f"  - 反模式: {t['anti_pattern']}")
+            lines.append(f"  - 轮换建议: {t['rotation']}")
+    if not any_hit:
+        lines.append("无。机检项未检出明显反模式。\n")
+    lines.append("## 二、人工核查项\n")
+    for t in techs:
+        if not t["detectors"]:
+            lines.append(f"- **{t['name']}**（{t['category']}）：{t['summary']}")
+    lines.append("")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    print(f"[techniques] 已写出: {path}")
+
+
+def cmd_techniques(args, conn, af, rh, th):
+    techs = load_techniques(conn)
+    if not args.text_file:
+        _print_technique_cards(techs)
+        return
+    text = open(args.text_file, encoding="utf-8").read()
+    results = scan_techniques(text, techs)
+    print(f"\n=== techniques: {args.text_file} ===")
+    print(f"  写作手法图谱: {len(techs)} 项, 可机检 {sum(1 for t in techs if t['detectors'])} 项")
+    for r in results:
+        t = r["tech"]
+        if r["hits"]:
+            print(f"  ⚠ [{t['category']}] {t['name']}: 反模式命中 {r['hits']} 处 "
+                  f"(样本: {', '.join(r['samples'])})")
+        else:
+            print(f"    [{t['category']}] {t['name']}: 文本中未检出反模式")
+    no_det = [t for t in techs if not t["detectors"]]
+    if no_det:
+        print(f"  · 人工核查项({len(no_det)}): " + " / ".join(t["name"] for t in no_det))
+    if args.out:
+        _write_technique_md(args.out, os.path.basename(args.text_file), results, techs)
+
+
 def main():
     ap = argparse.ArgumentParser(description="文学性 / 降AI味 审查")
     parent = argparse.ArgumentParser(add_help=False)
@@ -397,6 +510,11 @@ def main():
     p.add_argument("--out", required=True)
     p.add_argument("--no-record", action="store_true")
     p.set_defaults(func=cmd_report)
+
+    t = sub.add_parser("techniques", parents=[parent], help="写作手法图谱/反模式机检")
+    t.add_argument("--text-file", help="待检正文; 省略则仅列出手法图谱")
+    t.add_argument("--out", help="机检结果 markdown 输出路径")
+    t.set_defaults(func=cmd_techniques)
 
     args = ap.parse_args()
     conn = open_db(args.db)

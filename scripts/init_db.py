@@ -205,7 +205,7 @@ def import_project(conn, root):
 
 
 # ---------- 文学性种子导入 ----------
-def seed_literary(conn, rhetoric_path, ai_path, th_path):
+def seed_literary(conn, rhetoric_path, ai_path, th_path, wt_path=None):
     cur = conn.cursor()
 
     with open(rhetoric_path, "r", encoding="utf-8") as f:
@@ -240,8 +240,21 @@ def seed_literary(conn, rhetoric_path, ai_path, th_path):
             (t["name"], t["value"], t.get("unit"), t.get("note")))
         n_th += 1
 
+    n_wt = 0
+    if wt_path and os.path.isfile(wt_path):
+        with open(wt_path, "r", encoding="utf-8") as f:
+            wt = json.load(f)
+        for t in wt.get("techniques", []):
+            cur.execute(
+                "INSERT INTO writing_techniques(code,category,name,summary,when_use,anti_pattern,example,rotation,detectors) "
+                "VALUES(?,?,?,?,?,?,?,?,?)",
+                (t["code"], t.get("category"), t.get("name"), t.get("summary"),
+                 t.get("when_use"), t.get("anti_pattern"), t.get("example"),
+                 t.get("rotation"), json.dumps(t.get("detectors", []), ensure_ascii=False)))
+            n_wt += 1
+
     conn.commit()
-    print(f"[seed-literary] 已灌入: 修辞图谱{n_rh}  AI味谱系{n_af}  阈值{n_th}")
+    print(f"[seed-literary] 已灌入: 修辞图谱{n_rh}  AI味谱系{n_af}  阈值{n_th}  写作手法{n_wt}")
 
 
 def main():
@@ -275,7 +288,8 @@ def main():
         seed_literary(conn,
                       os.path.join(skill_root, "references", "rhetoric-catalog.json"),
                       os.path.join(skill_root, "references", "ai-flavor-catalog.json"),
-                      os.path.join(skill_root, "references", "style-thresholds.json"))
+                      os.path.join(skill_root, "references", "style-thresholds.json"),
+                      os.path.join(skill_root, "references", "writing-techniques.json"))
 
     conn.close()
     print(f"[完成] {datetime.now().isoformat(timespec='seconds')}")

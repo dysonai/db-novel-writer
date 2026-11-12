@@ -23,6 +23,7 @@
 | rhetoric_catalog | 修辞手法图谱 | type/format_desc/connectors(JSON)/example/rotation_rule/density_limit |
 | ai_flavor_catalog | AI 味写法谱系 | code/category/severity/match_type/match/replacements(JSON)/auto_fix/rationale |
 | style_thresholds | 风格阈值(可覆盖) | name/value/unit/note |
+| writing_techniques | 写作手法图谱(不止修辞) | code/category/name/summary/when_use/anti_pattern/example/rotation/detectors(JSON) |
 | style_audit_issues | 文学性审计结果 | chapter_id/issue_type(ai_flavor\|rhetoric\|dash\|short_sentence)/category/severity/line_no/detail/suggestion/resolved |
 | rhetoric_usage | 每章每类修辞计数 | chapter_id/device_type/count/density |
 
@@ -43,6 +44,10 @@ FROM rhetoric_usage GROUP BY device_type ORDER BY total DESC;
 SELECT code, category, COUNT(*) n
 FROM style_audit_issues WHERE issue_type='ai_flavor'
 GROUP BY code ORDER BY n DESC;
+
+-- 写作手法图谱(按类别统计可机检项)
+SELECT category, COUNT(*) n, SUM(CASE WHEN detectors IS NULL OR detectors='[]' THEN 0 ELSE 1 END) machine_checkable
+FROM writing_techniques GROUP BY category ORDER BY n DESC;
 ```
 
 ## ptype 取值

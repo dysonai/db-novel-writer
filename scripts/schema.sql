@@ -227,7 +227,24 @@ CREATE TABLE rhetoric_usage (
     FOREIGN KEY(chapter_id) REFERENCES chapters(id)
 );
 
+-- 写作手法图谱: 不止修辞 —— 把"怎么把人和事讲明白"也格式化为数据 -----
+-- 涵盖 遣词造句 / 引经据典 / 细节填充 / 展示不告知 / 对话 / 视角RPG / 节奏 / 钩子 / 环境烘托 / 伏笔
+-- detectors 为可机检的反模式标记(JSON 数组); 空=人工核查项
+CREATE TABLE writing_techniques (
+    id            INTEGER PRIMARY KEY,
+    code          TEXT UNIQUE NOT NULL,    -- wt-show-dont-tell ...
+    category      TEXT,                    -- 展示不告知/遣词造句/引经据典/细节填充/对话/视角RPG/节奏/钩子/环境烘托/伏笔
+    name          TEXT NOT NULL,
+    summary       TEXT,                    -- 说明
+    when_use      TEXT,                    -- 何时用
+    anti_pattern  TEXT,                    -- 反模式(AI 倾向)
+    example       TEXT,                    -- 示例
+    rotation      TEXT,                    -- 轮换/备选写法
+    detectors     TEXT                     -- JSON 数组: [{match_type, match}] 可机检项; 空=人工核查
+);
+
 -- 文学性索引 ------------------------------------------------
 CREATE INDEX idx_af_code ON ai_flavor_catalog(code);
 CREATE INDEX idx_sai_chap ON style_audit_issues(chapter_id);
 CREATE INDEX idx_ru_chap ON rhetoric_usage(chapter_id);
+CREATE INDEX idx_wt_code ON writing_techniques(code);
