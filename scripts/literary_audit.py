@@ -7,6 +7,8 @@ literary_audit.py -- 文学性 / 降AI味 审查
   - ai-flavor : 扫描 AI 味写法谱系命中, 输出位置与轮换替换建议; --fix 生成去味稿
   - rhetoric  : 统计修辞手法密度与同词近距离重复, 给轮换建议
   - report    : 综合输出 markdown 文学性审计报告(并落库 style_audit_issues / rhetoric_usage)
+  - post-chapter: 章节落定后统一自检——文学性三联检 + 伏笔/一致性动态清单(对应竞品三层保障),
+                 一处输出、可选落库、可选写综合报告。提交前必跑。
 
 所有判定依据都在数据库里(ai_flavor_catalog / rhetoric_catalog / style_thresholds),
 因此阈值与谱系可逐项目覆盖, 不写死在代码里。
@@ -119,6 +121,47 @@ def resolve_chapter_id(conn, num):
         return None
     row = conn.execute("SELECT id FROM chapters WHERE num=?", (num,)).fetchone()
     return row[0] if row else None
+
+
+def post_chapter_checklist(conn, chapter_num):
+    """章节落定后的动态自检清单(对应竞品 goink 三层保障之 layer2 动态注入)。
+
+    不代替 audit.py 的全量一致性扫描, 只聚焦"本回相关"的高频遗漏项:
+      1. 计划本回回收的伏笔是否仍 open
+      2. 本回新埋的伏笔是否忘了排 payoff
+      3. 库中未解决的一致性工单
+      4. 本回是否已抽场景实体入库
+    返回 [(tag, msg), ...]
+    """
+    cur = conn.cursor()
+    cnum = f"Ch{chapter_num}"
+    items = []
+    for row in cur.execute(
+        "SELECT code,title FROM foreshadowing "
+        "WHERE payoff_chapter=? AND status NOT IN ('paid_off','dropped')",
+        (cnum,)):
+        items.append(("伏笔回收",
+            f"[{row[0]}] {row[1]} 计划于 {cnum} 回收,但未标记 paid_off/dropped——"
+            f"请确认正文已回收,或修正 payoff_chapter/status。"))
+    for row in cur.execute(
+        "SELECT code,title FROM foreshadowing "
+        "WHERE planted_chapter=? AND status='planted'",
+        (cnum,)):
+        items.append(("伏笔埋设",
+            f"[{row[0]}] {row[1]} 于 {cnum} 埋设,记得在后续章节安排 payoff_chapter,避免石沉大海。"))
+    n = cur.execute("SELECT COUNT(*) FROM consistency_issues WHERE resolved=0").fetchone()[0]
+    if n:
+        items.append(("一致性工单",
+            f"库内尚有 {n} 条未解决一致性工单(consistency_issues.resolved=0),"
+            f"提交前请复查 audit.py 输出并处置。"))
+    cid = resolve_chapter_id(conn, chapter_num)
+    if cid:
+        sc = cur.execute("SELECT COUNT(*) FROM scenes WHERE chapter_id=?", (cid,)).fetchone()[0]
+        if sc == 0:
+            items.append(("场景抽库",
+                f"第 {chapter_num} 章在库中尚无 scene 记录——若已写作,请运行 capture.py "
+                f"抽场景实体(感知/道具流转)入库,防止记忆漂移。"))
+    return items
 
 
 # ---------------------------------------------------------------------------
@@ -484,6 +527,72 @@ def cmd_techniques(args, conn, af, rh, th):
         _write_technique_md(args.out, os.path.basename(args.text_file), results, techs)
 
 
+def cmd_post_chapter(args, conn, af, rh, th):
+    """章节落定后的统一自检入口: 文学性三联检 + DB 动态清单(对应竞品三层保障)。
+
+    等价于依次跑 ai-flavor + rhetoric + (可选)techniques 机检, 再叠加
+    post_chapter_checklist 的"本回相关"一致性待办, 一处输出、可选落库、可选写报告。
+    """
+    text = open(args.text_file, encoding="utf-8").read()
+    chapter_num = args.chapter
+    findings = scan_ai_flavor(text, af)
+    results, total = scan_rhetoric(text, rh, th)
+    dash = count_dash(text, th)
+    short = count_short_sentences(text, th)
+    chapter_id = resolve_chapter_id(conn, chapter_num)
+    techs = load_techniques(conn)
+    tech_results = scan_techniques(text, techs) if args.techniques else None
+
+    print(f"\n=== post-chapter 自检: {args.text_file} (Ch{chapter_num}) ===")
+    print_ai(findings)
+    print_rhetoric(results, total)
+    print(f"  破折号: {dash[0]} 处 / {dash[1]:.2f} 千字 (上限 {dash[2]})"
+          f"{' ⚠超上限' if dash[1] > dash[2] else ''}")
+    print(f"  连续短句最长: {short[0]} 句 (上限 {short[1]})"
+          f"{' ⚠断奏依赖' if short[0] > short[1] else ''}")
+    if tech_results:
+        for r in tech_results:
+            t = r["tech"]
+            if r["hits"]:
+                print(f"  ⚠ [{t['category']}] {t['name']}: 反模式命中 {r['hits']} 处 "
+                      f"(样本: {', '.join(r['samples'])})")
+            else:
+                print(f"    [{t['category']}] {t['name']}: 文本中未检出反模式")
+
+    checklist = post_chapter_checklist(conn, chapter_num)
+    print("\n--- 章节动态自检清单(三层保障 layer2) ---")
+    if checklist:
+        for tag, msg in checklist:
+            print(f"  [ ] {tag}: {msg}")
+    else:
+        print("  ✓ 无待办项,账目清爽。")
+
+    if not args.no_record:
+        record_ai(conn, chapter_id, findings)
+        record_rhetoric(conn, chapter_id, results, total)
+        print("\n  [已落库 style_audit_issues / rhetoric_usage]")
+
+    if args.out:
+        write_report_md(args.out, os.path.basename(args.text_file), total,
+                       findings, results, dash, short, th)
+        with open(args.out, "a", encoding="utf-8") as f:
+            f.write("\n## 四、章节动态自检清单\n")
+            if checklist:
+                for tag, msg in checklist:
+                    f.write(f"- [ ] **{tag}**: {msg}\n")
+            else:
+                f.write("- ✓ 无待办项\n")
+            if tech_results:
+                f.write("\n## 五、写作手法反模式机检\n")
+                for r in tech_results:
+                    t = r["tech"]
+                    if r["hits"]:
+                        f.write(f"- ⚠ **{t['name']}**（{t['category']}）：命中 {r['hits']} 处"
+                                 f"（样本: {', '.join(r['samples'])}）\n")
+                f.write("\n")
+        print(f"[post-chapter] 综合报告已写出: {args.out}")
+
+
 def main():
     ap = argparse.ArgumentParser(description="文学性 / 降AI味 审查")
     parent = argparse.ArgumentParser(add_help=False)
@@ -515,6 +624,15 @@ def main():
     t.add_argument("--text-file", help="待检正文; 省略则仅列出手法图谱")
     t.add_argument("--out", help="机检结果 markdown 输出路径")
     t.set_defaults(func=cmd_techniques)
+
+    pc = sub.add_parser("post-chapter", parents=[parent],
+                        help="章节落定后统一自检: 文学性三联检 + 伏笔/一致性动态清单")
+    pc.add_argument("--text-file", required=True)
+    pc.add_argument("--chapter", type=int, required=True, help="章节号(用于伏笔/一致性动态清单)")
+    pc.add_argument("--out", help="综合自检报告 markdown 输出路径")
+    pc.add_argument("--techniques", action="store_true", help="同时机检写作手法反模式")
+    pc.add_argument("--no-record", action="store_true", help="不写入数据库")
+    pc.set_defaults(func=cmd_post_chapter)
 
     args = ap.parse_args()
     conn = open_db(args.db)

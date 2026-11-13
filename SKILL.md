@@ -106,6 +106,30 @@ python scripts/literary_audit.py techniques --db .novel-db/novel.db \
   并写入 `style_audit_issues`、`rhetoric_usage` 两张结果表。
 - 破折号密度、连续短句数、明喻密度等上限由 `style_thresholds` 控制,可按项目硬规则改(如《红楼》破折号 ≤7/千字)。
 
+### 7. 章末统一自检 `post-chapter`（必做，提交前最后一道闸）
+
+写完整章初稿、跑完上面 1–6 步之后,**提交前必须跑一次 `post-chapter`**。它把文学性三联检
+(ai-flavor + rhetoric + 可选 techniques 机检)和数据库里的"本回相关"动态清单合到一处输出,
+对应竞品 goink 的"三层保障"——写完即自检,不靠人记。
+
+```bash
+python scripts/literary_audit.py post-chapter --db .novel-db/novel.db \
+    --text-file 第011章.md --chapter 11 \
+    --out .novel-db/post-ch11.md --techniques
+```
+
+它会输出并(默认)落库:
+1. **文学性三联检**:AI 味命中、修辞密度/近距离重复、破折号与连续短句上限、写作手法反模式(加 `--techniques`)。
+2. **章节动态自检清单**(layer2 动态注入,只列本回相关项):
+   - 计划本回回收的伏笔是否仍 `open`(忘了标 paid_off);
+   - 本回新埋的伏笔是否忘了排 `payoff_chapter`;
+   - 库中未解决的一致性工单数(`consistency_issues.resolved=0`);
+   - 本回是否漏了 `capture.py` 场景抽库。
+   清单为空则提示"账目清爽";非空则逐条处理后再提交。
+
+> 原则:这是"自检闸门"不是"自动修改器"——它只报告待办,改不改、怎么改由你定。
+> 已发布前 8 章正文仍**一字不改动**(项目铁律),`post-chapter` 只对新章生效。
+
 ## Perception 模型(perceptions 表)
 
 | ptype | 含义 | 用途 |
